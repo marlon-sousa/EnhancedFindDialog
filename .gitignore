@@ -1,0 +1,12 @@
+addon/doc/*.css
+addon/doc/en/
+addon/doc/**/*.md
+!addon/doc/**/*.tpl.md
+*_docHandler.py
+*.html
+*.ini
+*.mo
+*.pot
+*.py[co]
+*.nvda-addon
+.sconsign.dblite
