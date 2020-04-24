@@ -1,0 +1,39 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the EnhancedFindDialog package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: EnhancedFindDialog 0.0.1\n"
+"Report-Msgid-Bugs-To: nvda-translations@groups.io\n"
+"POT-Creation-Date: 2020-04-24 08:25-0300\n"
+"PO-Revision-Date: 2020-04-24 08:31-0300\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.3\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: pt_BR\n"
+
+#. Add-on summary, usually the user visible name of the addon.
+#. Translators: Summary for this add-on to be shown on installation and add-on information.
+#: buildVars.py:17
+msgid "Enhanced find dialog for NVDA"
+msgstr "Diálogo de busca extendido para o NVDA"
+
+#. Add-on description
+#. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
+#: buildVars.py:20
+msgid ""
+"This addon introduces improvements to the NVDA find dialog.\n"
+"It is now possible to have your previous searches history available on a "
+"list during the NVDA session, which will enable you to quickly select and "
+"search for previous searched terms."
+msgstr ""
+"Este complemento introduz melhorias no diálogo de busca do NVDA. \n"
+"Agora, é possível acessar os termos de busca anteriores, o que lhe "
+"permitirá realizar pesquisas baseadas em termos anteriores de maneira bem "
+"mais eficiente"

@@ -1,9 +1,9 @@
-# EnhancedFindDialog for NVDA 0.0.1
+# EnhancedFindDialog for NVDA 0.0.2
 Enhanced find dialog addon for NVDA, implementing search improvements:
 * search history
 
 ## Download
-Download the [Enhanced Find Dialog 0.0.1 addon](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/0.0.1/EnhancedFindDialog-0.0.1.nvda-addon)
+Download the [Enhanced Find Dialog 0.0.2 addon](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/0.0.2/EnhancedFindDialog-0.0.2.nvda-addon)
 
 ## Features
 

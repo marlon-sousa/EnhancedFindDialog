@@ -22,11 +22,11 @@ Esse é especialmente o caso de pessoas que programam diariamente com sistemas b
 
 No entanto, o NVDA não mantém os termos que você pesquisou
 anteriormente em uma lista. Isso diminui sua produtividade, porque, a menos que você esteja procurando exatamente
-o mesmo termo da sua última pesquisa, você deve digitá-lo novamente.
+o mesmo termo da sua última pesquisa, será preciso digitá-lo novamente.
 
-Esse complemento mantém um histórico de pesquisa que vale enquanto o NVDA estiver em execução. Assim, quando você o ativar, basta pressionar as setas para baixo
+Esse complemento mantém um histórico de pesquisa que vale enquanto o NVDA estiver em execução. Assim, quando ele estiver ativo, basta pressionar as setas para baixo
 e para cima para ver o histórico dos termos anteriormente pesquisados e
-pressionar enter no que você queira para efetuar uma nova pesquisa.
+pressionar enter no termo desejado para efetuar uma nova pesquisa.
 
 Você pode, naturalmente, digitar novos termos no diálogo de pesquisa. Eles também serão adicionados à lista na próxima vez que você ativar a caixa de diálogo.
 
@@ -34,55 +34,45 @@ Você pode, naturalmente, digitar novos termos no diálogo de pesquisa. Eles tam
 
 Basta instalar o complemento. Quando ele for ativado, pressionar as setas para cima e para baixo no campo de edição
 da caixa de diálogo de pesquisa permitirá
-navegar pela lista de termos pesquisados.
+navegar pela lista de termos pesquisados anteriormente.
 
 Você pode a qualquer momento digitar um novo termo, como de costume.
 
 ## Contribuindo
 
-### construindo o complemento
+### Gerando o complemento
 
-Você precisa:
+Você vai precisar de:
 
-* Python 3.6 ou superior.
-* pip deve estar configurado
+* python 3.6 ou superior
+* O pip deve estar configurado
 * scons (pip install scons)
 * markdown (pip install markdown)
-* utilitário msgfmt. A forma mais fácil de obtê-lo é instalando o git bash
-e escolher incluir bash tools at command prompt
+* comando msgfmt. A maneira mais simples de obtê-lo é instalar o git e, na instalação, escolher a opção para tornar as ferramentas do bash disponíveis para o prompt de comandos
 
-Quando você tiver tudo instalado, digitando scons na raiz do projeto
-deverá construir o complemento e gerar a documentação.
+Uma vez que estes ítems estejam instalados, basta escrever scons na pasta raiz do projeto para gerar o complemento  
 
-### traduções
+### Contribuindo traduções
 
-#### traduzindo o complemento
+#### Traduzindo o complemento
 
-Assumindo que você já tenha tudo configurado para construir o
-complemento (ver tópico anterior) digitando scons pot deverá gerar um
-arquivo pot na raiz do projeto. É então possível gerar e traduzir o
-arquivo .po para seu idioma.
-Os idiomas já traduzidos podem ser encontrados no diretório /addon/locale
+Assumindo-se que você já tenha o ambiente configurado para construir o complemento (veja item acima), para gerar um arquivo pot de tradução basta escrever scons pot na pasta raiz do projeto.
 
-#### traduzindo a documentação
+A partir daí, é possível contribuir os arquivos po de tradução para seu idioma.
 
-As traduções da documentação são geradas a partir de arquivos .tpl.md (não
-dos .md). É por isso que, exceto no arquivo readme.md na raiz do projeto, você não
-encontrará outros arquivos .md.
+Os idiomas atualmente já traduzidos podem ser encontrados na pasta addon/docs/locale.
 
-Os arquivos .tpl.md são arquivos markdown normais com uma adição: se você usar $ {[var]} dentro
-do texto, [var] será substituída por uma variável com o mesmo
-nome definido em buildvars.py quando os arquivos md e .html correspondentes
-forem gerados.
+#### Traduzindo documentação
 
-Se nenhuma variável com o nome existir, a substituição não ocorrerá.
+As documentações de tradução devem ser geradas a partir de arquivos .tpl.md (não de arquivos .md).
 
-Isso é útil, por exemplo, para gerar links e títulos com a versão atual do complemento sem precisar reescrever a documentação.
+Por isso, exceto pelo arquivo readme.md na raiz do projeto, você não encontrará outros arquivos .md versionados.
 
-Para traduzir a documentação, crie um diretório para seu idioma na
-pasta doc (se já não existir) e traduza o arquivo readme.tpl.md na raiz do projeto
-ou atualize o já existente.
+Os arquivos .tpl.md são arquivos markdown normais, exceto por um recurso a mais: se você usar ${[var]} em qualquer lugar do texto, [var] será substituído por uma variável com o mesmo nome ddefinida em buildVars.py.
+Caso não haja uma variável com o mesmo nome, a substituição não acontece.
 
-As variáveis ${[xxx]} não devem ser modificadas. Para gerar a
-documentação, digite scons e o markdown com as variáveis substituídas e
-o HTML serão gerados.
+Isso é útil, por exemplo, para fazer com que a documentação reflita limks ou número de versão do complemento automaticamente, sem que precise ser reescrita.
+
+Para traduzir a documentação, traduza o arquivo readme.tpl.md na raiz do projeto. O arquivo traduzido deve ser colocado na pasta addon/locale/[lang] e deve se chamar readme.tpl.md.
+
+As variáveis ${[var]} não devem ser alteradas. Escreva scons na raiz do projeto para que a documentação HTML e markdown seja gerada.
