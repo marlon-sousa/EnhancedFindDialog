@@ -47,4 +47,4 @@ i18nSources = pythonSources + ["buildVars.py"]
 
 # Files that will be ignored when building the nvda-addon file
 # Paths are relative to the addon directory, not to the root directory of your addon sources.
-excludedFiles = []
+excludedFiles = [os.path.join("addon", "doc", "*", "contributing*.*")]

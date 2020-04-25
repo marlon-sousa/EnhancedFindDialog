@@ -1,7 +1,8 @@
 addon/doc/*.css
-addon/doc/en/
 addon/doc/**/*.md
+!addon/doc/**/contributing.md
 !addon/doc/**/*.tpl.md
+!addon/doc/**/contributing.html
 *_docHandler.py
 *.html
 *.ini
