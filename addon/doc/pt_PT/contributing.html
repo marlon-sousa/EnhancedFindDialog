@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pt-PT" lang="pt-PT">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+<title>Enhanced find dialog for NVDA 0.0.2</title>
+</head>
+<body>
+<h1>Contribuir</h1>
+<h2>Criar  o extra</h2>
+<p>Para  isso, vai precisar de:</p>
+<ul>
+<li>python 3.6 ou superior</li>
+<li>O pip deve estar configurado</li>
+<li>scons (pip install scons)</li>
+<li>markdown (pip install markdown)</li>
+<li>comando msgfmt. A maneira mais simples de obtê-lo é instalar o git e, na instalação, escolher a opção para tornar as ferramentas do bash disponíveis para o prompt de comandos</li>
+</ul>
+<p>Uma vez que estes ítems estejam instalados, basta escrever scons na pasta raíz do projecto para criar o extra  </p>
+<h2>Contribuir para as traduções</h2>
+<h3>Traduzir o extra</h3>
+<p>Assumindo que já tenha o ambiente configurado para construir o extra (veja item acima), para criar um ficheiro ".pot", onde ficarão todas as mensagens para a  tradução, basta escrever scons pot, na pasta raíz do projecto.</p>
+<p>A partir deste ficheiro base, é possível construir os ficheiros ".po" de tradução para o seu idioma.</p>
+<p>Os idiomas  já traduzidos podem ser encontrados na pasta addon/docs/locale.</p>
+<h3>Traduzir a documentação</h3>
+<p>As documentações de tradução devem ser geradas a partir de ficheiros ".tpl.md" (não de ficheiros ".md").</p>
+<p>Por isso, excepto no ficheiro "readme.md", na raíz do projecto, não encontrará outros ficheiros ".md" versionados.</p>
+<p>Os ficheiros ".tpl.md" são ficheiros markdown normais, excepto por um recurso a mais: se  usar ${[var]} em qualquer lugar do texto, [var] será substituído por uma variável com o mesmo nome ddefinida em buildVars.py.
+Caso não haja uma variável com o mesmo nome, a substituição não acontece.</p>
+<p>Isto é útil, por exemplo, para fazer com que a documentação reflicta limks ou número de versão do extra automaticamente, sem que precise ser reescrita.</p>
+<p>Para traduzir a documentação, traduza o ficheiro "readme.tpl.md", na raíz do projecto. O ficheiro traduzido deve ser colocado na pasta addon/locale/[lang] e deve chamar-se "readme.tpl.md".</p>
+<p>As variáveis ${[var]} não devem ser alteradas. Escreva scons na raíz do projecto para que a documentação HTML e markdown seja criada.</p>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pt-BR" lang="pt-BR">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
+<title>Enhanced find dialog for NVDA 0.0.2</title>
+</head>
+<body>
+<h1>Contribuindo</h1>
+<h2>Gerando o complemento</h2>
+<p>Você vai precisar de:</p>
+<ul>
+<li>python 3.6 ou superior</li>
+<li>O pip deve estar configurado</li>
+<li>scons (pip install scons)</li>
+<li>markdown (pip install markdown)</li>
+<li>comando msgfmt. A maneira mais simples de obtê-lo é instalar o git e, na instalação, escolher a opção para tornar as ferramentas do bash disponíveis para o prompt de comandos</li>
+</ul>
+<p>Uma vez que estes ítems estejam instalados, basta escrever scons na pasta raiz do projeto para gerar o complemento  </p>
+<h2>Contribuindo traduções</h2>
+<h3>Traduzindo o complemento</h3>
+<p>Assumindo-se que você já tenha o ambiente configurado para construir o complemento (veja item acima), para gerar um arquivo pot de tradução basta escrever scons pot na pasta raiz do projeto.</p>
+<p>A partir daí, é possível contribuir os arquivos po de tradução para seu idioma.</p>
+<p>Os idiomas atualmente já traduzidos podem ser encontrados na pasta addon/docs/locale.</p>
+<h3>Traduzindo documentação</h3>
+<p>As documentações de tradução devem ser geradas a partir de arquivos .tpl.md (não de arquivos .md).</p>
+<p>Por isso, exceto pelo arquivo readme.md na raiz do projeto, você não encontrará outros arquivos .md versionados.</p>
+<p>Os arquivos .tpl.md são arquivos markdown normais, exceto por um recurso a mais: se você usar ${[var]} em qualquer lugar do texto, [var] será substituído por uma variável com o mesmo nome ddefinida em buildVars.py.
+Caso não haja uma variável com o mesmo nome, a substituição não acontece.</p>
+<p>Isso é útil, por exemplo, para fazer com que a documentação reflita limks ou número de versão do complemento automaticamente, sem que precise ser reescrita.</p>
+<p>Para traduzir a documentação, traduza o arquivo readme.tpl.md na raiz do projeto. O arquivo traduzido deve ser colocado na pasta addon/locale/[lang] e deve se chamar readme.tpl.md.</p>
+<p>As variáveis ${[var]} não devem ser alteradas. Escreva scons na raiz do projeto para que a documentação HTML e markdown seja gerada.</p>
+</body>
+</html>
