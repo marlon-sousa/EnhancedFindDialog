@@ -32,4 +32,4 @@ Pode, a qualquer momento e desde que disso necessite, escrever um novo termo, co
 
 # ajudando a traduzir ou desenvolver o extra
 
-Se quiser ajudar a traduzir ou desenvolver o extra, acesse o [repositório do projeto](https://github.com/marlon-sousa/EnhancedFindDialog) e busque pelo arquivo contrib.tpl no diretório de documentação equivalente ao seu idioma.
+Se quiser ajudar a traduzir ou desenvolver o extra, acesse o [repositório do projeto](https://github.com/marlon-sousa/EnhancedFindDialog) e busque pelo arquivo contrib.md no diretório de documentação equivalente ao seu idioma.
