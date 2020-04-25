@@ -30,4 +30,4 @@ You can at any time type a new term as usual.
 
 # Contributing and translating
 
-If you want to contribute or translate this addon, please access the [project repository](https://github.com/marlon-sousa/EnhancedFindDialog) and find instructions on the contributing.html file in the english documentation
+If you want to contribute or translate this addon, please access the [project repository](https://github.com/marlon-sousa/EnhancedFindDialog) and find instructions on the contributing.md in the english documentation directory

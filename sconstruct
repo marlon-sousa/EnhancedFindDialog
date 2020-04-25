@@ -132,7 +132,6 @@ def createAddonHelp(dir):
 def createAddonBundleFromPath(path, dest):
 	""" Creates a bundle from a directory that contains an addon manifest file."""
 	excludedFiles = expandGlobs(buildVars.excludedFiles, True)
-	print (f"Will exclude following files: {excludedFiles})")
 	basedir = os.path.abspath(path)
 	with zipfile.ZipFile(dest, 'w', zipfile.ZIP_DEFLATED) as z:
 		# FIXME: the include/exclude feature may or may not be useful. Also python files can be pre-compiled.
@@ -141,7 +140,6 @@ def createAddonBundleFromPath(path, dest):
 			for filename in filenames:
 				pathInBundle = os.path.join(relativePath, filename)
 				absPath = os.path.join(dir, filename)
-				print(f"looking for addon\\{pathInBundle} in {excludedFiles}")
 				if f"addon\\{pathInBundle}" not in excludedFiles and not ".tpl.md" in pathInBundle: z.write(absPath, pathInBundle)
 	return dest
 
