@@ -4,6 +4,7 @@
 #This file is covered by the GNU General Public License.
 #See the file COPYING.txt for more details.
 
+import addonHandler
 import config
 import controlTypes
 from cursorManager import CursorManager
@@ -15,6 +16,20 @@ from tones import beep
 import ui
 import os
 import wx
+
+# this addon mostly complements NVDA functionalities.
+# however, because the way NVDA works, when you use
+# addon translation infrastructure by calling addonHandler.initTranslation() you loose access to the
+# NVDA translated strings
+# It is all or nothing: if you call addonHandler.initTranslation() the _(str) function looks for translations only in the addon localization files.
+# if you don't, then the _(str) function looks for translations in the NVDA localization files, but not in the addon localization files
+# In this addon, we add new elements to specific dialogs. Of course the translations for these elements are not available in nvda localization files.
+# In the other hand, we use lots of strings that are already translated in NVDA
+# So now we need to access the nvda localization files to have already defined translations, but we also need to access addon translation files to translate custom dialogs
+# What we did is we saved the nvda translator to the __ variable while _ variable now is used to translate addon strings
+
+__ = _
+addonHandler.initTranslation()
 
 # search history list constants
 SEARCH_HISTORY_MOST_RECENT_INDEX = 0
@@ -76,7 +91,7 @@ def doFindText(self,text,reverse=False,caseSensitive=False, searchWrap = False):
 		info.expand(textInfos.UNIT_LINE)
 		speech.speakTextInfo(info,reason=controlTypes.REASON_CARET)
 	else:
-		wx.CallAfter(gui.messageBox,_('text "%s" not found')%text,_("Find Error"),wx.OK|wx.ICON_ERROR)
+		wx.CallAfter(gui.messageBox, __('text "%s" not found')%text, __("Find Error"), wx.OK | wx.ICON_ERROR)
 	CursorManager._lastFindText=text
 	CursorManager._lastCaseSensitivity=caseSensitive
 	CursorManager._searchWrap = searchWrap

@@ -4,6 +4,7 @@
 #This file is covered by the GNU General Public License.
 #See the file COPYING.txt for more details.
 
+import addonHandler
 import config
 import core
 import cursorManager
@@ -20,11 +21,13 @@ import wx
 # So now we need to access the nvda localization files to have already defined translations, but we also need to access addon translation files to translate custom dialogs
 # What we did is we saved the nvda translator to the __ variable while _ variable now is used to translate addon strings
 
+__ = _
+addonHandler.initTranslation()
+
 # search history list constants
 SEARCH_HISTORY_MOST_RECENT_INDEX = 0
 SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
 
-__ = _
 
 # case sensitivity and search wrapping checkboxes state will be persisted per profile
 # so we need to be able to get and set values from config
