@@ -4,17 +4,33 @@
 #This file is covered by the GNU General Public License.
 #See the file COPYING.txt for more details.
 
+import config
 from . import cursorManagerHelper
 from . import guiHelper
 import globalPluginHandler
-from logHandler import log
+import globalVars
+from scriptHandler import script
+
+module = "EnhancedFindDialog"
+
+
+def initConfiguration():
+	confspec = {
+		"searchCaseSensitivity" : "boolean( default=False)",
+		"searchWrap" : "boolean( default=False)",
+	}
+	config.conf.spec[module] = confspec
+
+def getActiveProfile(self):
+	if globalVars.appArgs.secure:
+		return
+	return self.profiles[-1]
 
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def __init__(self, *args, **kwargs):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
-		log.debug("constructor called fo enhanced find")
 		self.injectProcessing()
 	
 	# the method below is responsible for modifying NVDA behavior.
@@ -22,6 +38,11 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	# for example, when calling the find dialog we need to show the enhanced version provided by this addon
 	# the CursorManager mixin also needs to have functionality added
 	def injectProcessing(self):
-		# add methods to SpeechDict class
-		cursorManagerHelper.patchCursorManager()
+		# add utility method to ConfigManager class to allow us to get the active profile in a higher level
+		if not hasattr(config.ConfigManager, "getActiveProfile"):
+			config.ConfigManager.getActiveProfile = getActiveProfile
+		
+		initConfiguration()
 
+		# add methods to CursorManager class
+		cursorManagerHelper.patchCursorManager()

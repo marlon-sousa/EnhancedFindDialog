@@ -7,7 +7,6 @@
 import config
 import core
 import cursorManager
-from logHandler import log
 import wx
 
 # this addon mostly complements NVDA functionalities.
@@ -27,16 +26,58 @@ SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
 
 __ = _
 
+# case sensitivity and search wrapping checkboxes state will be persisted per profile
+# so we need to be able to get and set values from config
+
+module = "EnhancedFindDialog"
+
+def strToBool(value):
+	if not isinstance(value, str):
+		return value
+	return value == "True"
+
+# we need to mark profiles we updated for save, otherwise they will not be persisted
+def scheduleProfileSave(profile):
+	# default pprofile is always saved
+	if not profile.name:
+		return
+	config.conf._dirtyProfiles.add(profile.name)
+
+# get config from default profile
+def getDefaultConfig(key):
+	return config.conf[module][key]
+
+
+def getConfig(profile, key):
+	# if this is not set on current profile, use the default config values.
+	if not module in profile or not key in profile[module]:
+		return getDefaultConfig(key)
+	return profile[module][key]
+
+
+def setConfig(profile, key, value):
+	if not module in profile:
+		profile[module] = {}
+	profile[module][key] = value
+
 
 class EnhancedFindDialog(wx.Dialog):
 	"""A dialog used to specify text to find in a cursor manager.
 	"""
 
-	def __init__(self, parent, cursorManager, caseSensitivity, searchEntries):
+	def __init__(self, parent, cursorManager, profile, searchEntries):
 		# Translators: Title of a dialog to find text.
 		super(EnhancedFindDialog, self).__init__(parent, wx.ID_ANY, __("Find"))
+		# if checkboxes change during this dialog we need to save the profile with the new values
+		self._mustSaveProfile = False
 		# Have a copy of the active cursor manager, as this is needed later for finding text.
 		self.activeCursorManager = cursorManager
+		# have a copy of the profile active when this dialog was called
+		# this is needed because whenever the find dialog is opened the default probile is loaded. We, however, want to retrieve state from the active profile when the find dialog was loaded
+		self.profile = profile
+		caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
+		searchWrap = strToBool(getConfig(profile, "searchWrap"))
+
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 
 		findSizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -53,7 +94,13 @@ class EnhancedFindDialog(wx.Dialog):
 		# Translators: An option in find dialog to perform case-sensitive search.
 		self.caseSensitiveCheckBox=wx.CheckBox(self,wx.ID_ANY,label=__("Case &sensitive"))
 		self.caseSensitiveCheckBox.SetValue(caseSensitivity)
+		self.caseSensitiveCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		mainSizer.Add(self.caseSensitiveCheckBox,border=10,flag=wx.BOTTOM)
+		# Translators: An option in find dialog to perform search wrapping
+		self.searchWrapCheckBox=wx.CheckBox(self,wx.ID_ANY,label=_("Search &wrap"))
+		self.searchWrapCheckBox.SetValue(searchWrap)
+		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+		mainSizer.Add(self.searchWrapCheckBox,border=10,flag=wx.BOTTOM)
 
 		mainSizer.Add(self.CreateButtonSizer(wx.OK|wx.CANCEL), flag=wx.ALIGN_RIGHT)
 		self.Bind(wx.EVT_BUTTON,self.onOk,id=wx.ID_OK)
@@ -88,20 +135,31 @@ class EnhancedFindDialog(wx.Dialog):
 		if len(searchEntries) > SEARCH_HISTORY_LEAST_RECENT_INDEX:
 			self._truncateSearchHistory(searchEntries)
 		searchEntries.insert(SEARCH_HISTORY_MOST_RECENT_INDEX, currentSearchTerm)
-		
+	
 	def onOk(self, evt):
 		text = self.findTextField.GetValue()
 		# update the list of searched entries so that it can be exibited in the next find dialog call
 		self.updateSearchEntries(self.activeCursorManager._searchEntries, text)
 		
 		caseSensitive = self.caseSensitiveCheckBox.GetValue()
+		setConfig(self.profile, "searchCaseSensitivity", caseSensitive)
+
+		searchWrap = self.searchWrapCheckBox.GetValue()
+		setConfig(self.profile, "searchWrap", searchWrap)
+
+		if self._mustSaveProfile:
+			scheduleProfileSave(self.profile)
+
 		# We must use core.callLater rather than wx.CallLater to ensure that the callback runs within NVDA's core pump.
 		# If it didn't, and it directly or indirectly called wx.Yield, it could start executing NVDA's core pump from within the yield, causing recursion.
-		core.callLater(100, self.activeCursorManager.doFindText, text, caseSensitive=caseSensitive)
+		core.callLater(100, self.activeCursorManager.doFindText, text, caseSensitive=caseSensitive, searchWrap = searchWrap)
 		self.Destroy()
 
 	def onCancel(self, evt):
 		self.Destroy()
+
+	def onStatChange(self, evt):
+		self._mustSaveProfile = True
 
 	def _truncateSearchHistory(self, entries):
 		del entries[SEARCH_HISTORY_LEAST_RECENT_INDEX:]
