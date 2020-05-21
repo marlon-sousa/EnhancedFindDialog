@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: EnhancedFindDialog 0.0.1\n"
 "Report-Msgid-Bugs-To: nvda-translations@groups.io\n"
 "POT-Creation-Date: 2020-05-20 07:56-0300\n"
-"PO-Revision-Date: 2020-05-20 08:02-0300\n"
+"PO-Revision-Date: 2020-05-21 20:02-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_PT\n"
@@ -21,7 +21,7 @@ msgstr ""
 #. Translators: An option in find dialog to perform search wrapping
 #: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:103
 msgid "Search &wrap"
-msgstr "Busca &circular"
+msgstr "Continuidade da &busca"
 
 #. Add-on summary, usually the user visible name of the addon.
 #. Translators: Summary for this add-on to be shown on installation and add-on information.

@@ -148,7 +148,7 @@ Relatar Marlon como spammer
 
 Mencionar Marlon em uma resposta
 
-Além disso, se você pressionasse NVDA + f3 rapidamente, ouviria o início de cada linha, permitindo pressionar rapidamente enter na linha de destino, porque você sabe que
+Além disso, se você pressionasse NVDA + f3 rapidamente, ouviria o início de cada linha, permitindo pressionar rapidamente enter na linha iniciada com mensionar, porque você sabe que
 "Marlon" está presente mais à frente nessa linha.
 
 # ajudando a traduzir ou desenvolver o complemento
