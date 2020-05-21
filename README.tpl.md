@@ -122,6 +122,13 @@ Target Marlon on a response
 
 Further more, if you pressed NVDA + f3 quickly, you would hear the beginning of each line, allowing you to quickly hit enter on the target line because you know that Marlon is present att a latter position on that same line.
 
-# Contributing and translating
+## Contributing and translating
 
 If you want to contribute or translate this addon, please access the [project repository](https://github.com/marlon-sousa/EnhancedFindDialog) and find instructions on the contributing.md in the english documentation directory.
+
+## Contributors
+
+Special thanks to
+
+*  Thiago Seus - Brazilian Portuguese translation
+* Ângelo Miguel Abrantes - Portuguese translation
