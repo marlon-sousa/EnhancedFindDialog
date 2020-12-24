@@ -153,4 +153,13 @@ Além disso, se você pressionasse NVDA + f3 rapidamente, ouviria o início de c
 
 # ajudando a traduzir ou desenvolver o complemento
 
-Se quiser ajudar a traduzir ou desenvolver o complemento, acesse o [repositório do projeto](https://github.com/marlon-sousa/EnhancedFindDialog) e busque pelo arquivo contrib.md no diretório de documentação equivalente ao seu idioma.
+Se quiser ajudar a traduzir ou desenvolver o complemento, acesse o [repositório do projeto](https://github.com/marlon-sousa/EnhancedFindDialog) e busque pelo arquivo contributing.md no diretório de documentação equivalente ao seu idioma.
+
+## Colaboradores
+
+Agradecimentos a:
+
+*  Thiago Seus - Brazilian Portuguese translation
+* Ângelo Miguel Abrantes - Portuguese translation
+* Rémy Ruiz - French translation
+* Rémy Ruiz - Spanish translation
