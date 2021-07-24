@@ -89,7 +89,7 @@ def doFindText(self,text,reverse=False,caseSensitive=False, searchWrap = False):
 		speech.cancelSpeech()
 		info.move(textInfos.UNIT_LINE,1, endPoint="start")
 		info.expand(textInfos.UNIT_LINE)
-		speech.speakTextInfo(info,reason=controlTypes.REASON_CARET)
+		speech.speakTextInfo(info,reason=controlTypes.OutputReason.CARET)
 	else:
 		wx.CallAfter(gui.messageBox, __('text "%s" not found')%text, __("Find Error"), wx.OK | wx.ICON_ERROR)
 	CursorManager._lastFindText=text
