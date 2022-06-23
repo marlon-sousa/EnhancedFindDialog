@@ -8,6 +8,7 @@ import addonHandler
 import config
 import core
 import cursorManager
+from gui import contextHelp
 import wx
 
 # this addon mostly complements NVDA functionalities.
@@ -64,13 +65,18 @@ def setConfig(profile, key, value):
 	profile[module][key] = value
 
 
-class EnhancedFindDialog(wx.Dialog):
+class EnhancedFindDialog(
+	contextHelp.ContextHelpMixin,
+	wx.Dialog
+):
 	"""A dialog used to specify text to find in a cursor manager.
 	"""
 
+	helpId = "SearchingForText"
+
 	def __init__(self, parent, cursorManager, profile, searchEntries):
 		# Translators: Title of a dialog to find text.
-		super(EnhancedFindDialog, self).__init__(parent, wx.ID_ANY, __("Find"))
+		super().__init__(parent, title=__("Find"))
 		# if checkboxes change during this dialog we need to save the profile with the new values
 		self._mustSaveProfile = False
 		# Have a copy of the active cursor manager, as this is needed later for finding text.
@@ -113,6 +119,7 @@ class EnhancedFindDialog(wx.Dialog):
 		self.SetSizer(mainSizer)
 		self.CentreOnScreen()
 		self.findTextField.SetFocus()
+
 
 	def updateSearchEntries(self, searchEntries, currentSearchTerm):
 		if not currentSearchTerm:
