@@ -10,7 +10,9 @@ import controlTypes
 from cursorManager import CursorManager
 import gui
 from . import guiHelper
+import re
 import speech
+from scriptHandler import willSayAllResume
 import textInfos
 from tones import beep
 import ui
@@ -69,34 +71,46 @@ def script_enhancedFindNext(self,gesture):
 	if not self._searchEntries:
 		self.script_find(gesture)
 		return
-	self.doFindText(self._searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX], caseSensitive = self._lastCaseSensitivity, searchWrap = self._searchWrap)
+	self.doFindText(
+		self._searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX],
+		caseSensitive = self._lastCaseSensitivity,
+		searchWrap = self._searchWrap,
+		willSayAllResume=willSayAllResume(gesture),
+	)
 
 
 def script_EnhancedFindPrevious(self,gesture):
 	if not self._searchEntries:
 		self.script_find(gesture)
 		return
-	self.doFindText(self._searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX], reverse=True, caseSensitive = self._lastCaseSensitivity, searchWrap = self._searchWrap)
+	self.doFindText(
+		self._searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX],
+		reverse=True,
+		caseSensitive = self._lastCaseSensitivity,
+		searchWrap = self._searchWrap,
+		willSayAllResume=willSayAllResume(gesture)
+	)
 
-def doFindText(self,text,reverse=False,caseSensitive=False, searchWrap = False):
+def doFindText(self,text,reverse=False,caseSensitive=False, searchWrap = False, willSayAllResume=False):
 	if not text:
 		return
 	
 	info=self.makeTextInfo(textInfos.POSITION_CARET)
-	res = performSearch(text, info, reverse, caseSensitive, searchWrap)
+	res = performSearch(self, text, info, reverse, caseSensitive, searchWrap)
 	if res:
 		self.selection=info
 		speech.cancelSpeech()
 		info.move(textInfos.UNIT_LINE,1, endPoint="start")
 		info.expand(textInfos.UNIT_LINE)
-		speech.speakTextInfo(info,reason=controlTypes.OutputReason.CARET)
+		if not willSayAllResume:
+			speech.speakTextInfo(info,reason=controlTypes.OutputReason.CARET)
 	else:
 		wx.CallAfter(gui.messageBox, __('text "%s" not found')%text, __("Find Error"), wx.OK | wx.ICON_ERROR)
 	CursorManager._lastFindText=text
 	CursorManager._lastCaseSensitivity=caseSensitive
 	CursorManager._searchWrap = searchWrap
 
-def performSearch(text, info, reverse, caseSensitive, wrapSearch):
+def performSearch(cursorManager, text, info, reverse, caseSensitive, wrapSearch):
 	res=info.find(text, reverse = reverse, caseSensitive = caseSensitive)
 	# if either not interested in search wrapping or we have found a result then we are done here
 	if not wrapSearch or res:
@@ -106,5 +120,18 @@ def performSearch(text, info, reverse, caseSensitive, wrapSearch):
 		found = True
 	if found:
 		beep(440, 30)
+		return found
+	
+	# We currently have no content either above or below the current selection matching the searched text
+	# we now have to check if the selection itself matches the searched text, meaning that there is only one instance of the searched text in the whole content.
+	# If it does, because we are in screen wrapping mode, we have to beep and returm the current selection
+	# otherwise, we can safely return that the searched text is not matched
+	# currently, the findTextInfo function either advances or returns one position before proceeding with the search, which is something we are not interested in
+	info = cursorManager.makeTextInfo(textInfos.POSITION_CARET).copy()
+	info.expand(textInfos.UNIT_STORY)
+	inText = info._get_text()
+	found = re.search(re.escape(text),inText,(0 if caseSensitive else re.IGNORECASE)|re.UNICODE)
+	if found:
+		beep(440, 30)		
 	return found
 	
