@@ -8,6 +8,7 @@ import addonHandler
 import config
 import core
 import cursorManager
+from . import cursorManagerHelper
 from gui import contextHelp
 import wx
 
@@ -162,7 +163,7 @@ class EnhancedFindDialog(
 
 		# We must use core.callLater rather than wx.CallLater to ensure that the callback runs within NVDA's core pump.
 		# If it didn't, and it directly or indirectly called wx.Yield, it could start executing NVDA's core pump from within the yield, causing recursion.
-		core.callLater(100, self.activeCursorManager.doFindText, text, caseSensitive=caseSensitive, searchWrap = searchWrap)
+		core.callLater(100, cursorManagerHelper.doFindText, self.activeCursorManager, text, caseSensitive=caseSensitive, searchWrap = searchWrap)
 		self.Destroy()
 
 	def onCancel(self, evt):
