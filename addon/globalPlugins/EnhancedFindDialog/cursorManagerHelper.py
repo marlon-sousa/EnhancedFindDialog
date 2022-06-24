@@ -50,8 +50,7 @@ def patchCursorManager():
 	CursorManager.script_find = script_enhancedFind
 	CursorManager.script_findNext = script_enhancedFindNext
 	CursorManager.script_findPrevious = script_EnhancedFindPrevious
-	# our enhanced dfind text method
-	CursorManager.doFindText = doFindText
+
 
 
 def script_enhancedFind(self,gesture):
@@ -71,7 +70,8 @@ def script_enhancedFindNext(self,gesture):
 	if not self._searchEntries:
 		self.script_find(gesture)
 		return
-	self.doFindText(
+	doFindText(
+		self,
 		self._searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX],
 		caseSensitive = self._lastCaseSensitivity,
 		searchWrap = self._searchWrap,
@@ -83,7 +83,8 @@ def script_EnhancedFindPrevious(self,gesture):
 	if not self._searchEntries:
 		self.script_find(gesture)
 		return
-	self.doFindText(
+	doFindText(
+		self,
 		self._searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX],
 		reverse=True,
 		caseSensitive = self._lastCaseSensitivity,
@@ -91,14 +92,14 @@ def script_EnhancedFindPrevious(self,gesture):
 		willSayAllResume=willSayAllResume(gesture)
 	)
 
-def doFindText(self,text,reverse=False,caseSensitive=False, searchWrap = False, willSayAllResume=False):
+def doFindText(cursorManagerInstance, text,reverse=False,caseSensitive=False, searchWrap = False, willSayAllResume=False):
 	if not text:
 		return
 	
-	info=self.makeTextInfo(textInfos.POSITION_CARET)
-	res = performSearch(self, text, info, reverse, caseSensitive, searchWrap)
+	info = cursorManagerInstance.makeTextInfo(textInfos.POSITION_CARET)
+	res = performSearch(cursorManagerInstance, text, info, reverse, caseSensitive, searchWrap)
 	if res:
-		self.selection=info
+		cursorManagerInstance.selection=info
 		speech.cancelSpeech()
 		info.move(textInfos.UNIT_LINE,1, endPoint="start")
 		info.expand(textInfos.UNIT_LINE)
