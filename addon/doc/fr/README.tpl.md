@@ -135,4 +135,5 @@ Remerciement spécial à
 * Rémy Ruiz - Traduction Français
 * Rémy Ruiz - Traduction Espagnol
 *  Thiago Seus - Traduction Portugais Brésil
+* Umut KORKMAZ - Traduction turc
 * Valentin Kupriyanov - Traduction Russe
