@@ -134,4 +134,5 @@ NVDA ����� ���� ��������� ������
 * �' ngelo Miguel Abrantes - ������� �� ������������� ����
 * Rémy Ruiz - ����������� �������
 * Rémy Ruiz - ������� �� ���������
+* Umut KORKMAZ - turetskiy perevod
 * Valentin Kupriyanov - Русский перевод
