@@ -136,5 +136,6 @@ Agradecimientos especiales a
 * Rémy Ruiz - Traducción Francés
 * Tarik Hadžirović - Traducción Croata
 *  Thiago Seus - Traducción Portugués del Brasil
-* Valentin Kupriyanov - Traducción Rusa
 * Umut KORKMAZ - Traducción turco
+* Valentin Kupriyanov - Traducción Rusa
+
