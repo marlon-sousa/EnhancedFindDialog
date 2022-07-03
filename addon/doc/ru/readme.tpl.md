@@ -130,9 +130,11 @@ NVDA ����� ���� ��������� ������
 
 ������ �������������
 
-* Thiago Seus - ����������� ������������� �������
+
 * �' ngelo Miguel Abrantes - ������� �� ������������� ����
 * Rémy Ruiz - ����������� �������
 * Rémy Ruiz - ������� �� ���������
-* Umut KORKMAZ - turetskiy perevod
+* Tarik Hadžirović - хорватский перевод
+* Thiago Seus - ����������� ������������� �������
+* Umut KORKMAZ - турецкий перевод
 * Valentin Kupriyanov - Русский перевод
