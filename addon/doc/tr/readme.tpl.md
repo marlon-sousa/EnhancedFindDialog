@@ -134,6 +134,7 @@ Bu eklentiye katkıda bulunmak veya bu eklentiyi çevirmek istiyorsanız, lütfe
 * Angelo Miguel Abrantes - Portekizce çeviri  
 * Rémy Ruiz - Fransızca çeviri
 * Rémy Ruiz - İspanyolca çeviri  
+* Tarik Hadžirović - Hırvatça çeviri
 *  Thiago Seus - Brezilya Portekizcesi çeviri  
-* Valentin Kupriyanov - Rusça çeviri  
 * Umut KORKMAZ - Türkçe Çeviri  
+* Valentin Kupriyanov - Rusça çeviri  

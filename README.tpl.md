@@ -134,6 +134,7 @@ Special thanks to
 * Ângelo Miguel Abrantes - Portuguese translation
 * Rémy Ruiz - French translation
 * Rémy Ruiz - Spanish translation
+* Tarik Hadžirović - Croatian translation
 *  Thiago Seus - Brazilian Portuguese translation
 * Umut KORKMAZ - Turkish translation
 * Valentin Kupriyanov - Russian translation
