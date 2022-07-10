@@ -138,3 +138,4 @@ NVDA ����� ���� ��������� ������
 * Thiago Seus - ����������� ������������� �������
 * Umut KORKMAZ - турецкий перевод
 * Valentin Kupriyanov - Русский перевод
+* Ivan Shtefuriak - Украинский перевод

@@ -138,3 +138,4 @@ Bu eklentiye katkıda bulunmak veya bu eklentiyi çevirmek istiyorsanız, lütfe
 *  Thiago Seus - Brezilya Portekizcesi çeviri  
 * Umut KORKMAZ - Türkçe Çeviri  
 * Valentin Kupriyanov - Rusça çeviri  
+* Ivan Shtefuriak - Ukraynaca çeviri

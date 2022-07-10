@@ -138,3 +138,4 @@ Special thanks to
 *  Thiago Seus - Brazilian Portuguese translation
 * Umut KORKMAZ - Turkish translation
 * Valentin Kupriyanov - Russian translation
+* Ivan Shtefuriak - Ukrainian translation

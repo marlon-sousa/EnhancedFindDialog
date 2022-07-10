@@ -138,4 +138,5 @@ Agradecimientos especiales a
 *  Thiago Seus - Traducción Portugués del Brasil
 * Umut KORKMAZ - Traducción turco
 * Valentin Kupriyanov - Traducción Rusa
+* Ivan Shtefuriak - Traducción al Ucraniano
 
