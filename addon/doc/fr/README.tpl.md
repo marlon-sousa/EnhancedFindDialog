@@ -138,3 +138,4 @@ Remerciement spécial à
 *  Thiago Seus - Traduction Portugais Brésil
 * Umut KORKMAZ - Traduction turc
 * Valentin Kupriyanov - Traduction Russe
+* Ivan Shtefuriak - Traduction Ukrainien

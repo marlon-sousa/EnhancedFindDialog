@@ -167,3 +167,4 @@ Agradecimentos a:
 *  Thiago Seus - Tradução para Português Brasileiro
 * Umut KORKMAZ - tradução para Turco
 * Valentin Kupriyanov - tradução para Russo
+* Ivan Shtefuriak - tradução para Ucraniano
