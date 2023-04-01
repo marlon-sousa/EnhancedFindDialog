@@ -83,7 +83,7 @@ class EnhancedFindDialog(
 		# Have a copy of the active cursor manager, as this is needed later for finding text.
 		self.activeCursorManager = cursorManager
 		# have a copy of the profile active when this dialog was called
-		# this is needed because whenever the find dialog is opened the default probile is loaded. We, however, want to retrieve state from the active profile when the find dialog was loaded
+		# this is needed because whenever the find dialog is opened the default profile is loaded. We, however, want to retrieve state from the active profile when the find dialog was loaded
 		self.profile = profile
 		caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
 		searchWrap = strToBool(getConfig(profile, "searchWrap"))
