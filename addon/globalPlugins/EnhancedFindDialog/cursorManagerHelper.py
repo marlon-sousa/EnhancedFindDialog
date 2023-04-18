@@ -11,6 +11,7 @@ from cursorManager import CursorManager
 import gui
 from . import guiHelper
 import re
+from speech import sayAll
 import speech
 from scriptHandler import willSayAllResume
 import textInfos
@@ -135,4 +136,8 @@ def performSearch(cursorManager, text, info, reverse, caseSensitive, wrapSearch)
 	if found:
 		beep(440, 30)		
 	return found
-	
+
+# Patch say all functionality. This is necessary to do after patching because the patched script loses the reference to the decorated say all from NVDA, losing the attribute.
+script_enhancedFind.resumeSayAllMode=sayAll.CURSOR.CARET
+script_enhancedFindNext.resumeSayAllMode=sayAll.CURSOR.CARET
+script_EnhancedFindPrevious.resumeSayAllMode=sayAll.CURSOR.CARET
