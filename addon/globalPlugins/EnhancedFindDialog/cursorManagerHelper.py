@@ -54,7 +54,7 @@ def patchCursorManager():
 
 
 
-def script_enhancedFind(self,gesture):
+def script_enhancedFind(self, gesture, reverse=False):
 	# #8566: We need this to be a modal dialog, but it mustn't block this script.
 	def run():
 		# get the active profile and send that to the find dialog
@@ -62,7 +62,7 @@ def script_enhancedFind(self,gesture):
 		profile = config.conf.getActiveProfile()
 
 		gui.mainFrame.prePopup()
-		d = guiHelper.EnhancedFindDialog(gui.mainFrame, self, profile, self._searchEntries)
+		d = guiHelper.EnhancedFindDialog(gui.mainFrame, self, profile, self._searchEntries, reverse)
 		d.ShowModal()
 		gui.mainFrame.postPopup()
 	wx.CallAfter(run)
@@ -82,7 +82,7 @@ def script_enhancedFindNext(self,gesture):
 
 def script_EnhancedFindPrevious(self,gesture):
 	if not self._searchEntries:
-		self.script_find(gesture)
+		self.script_find(gesture, reverse=True)
 		return
 	doFindText(
 		self,
