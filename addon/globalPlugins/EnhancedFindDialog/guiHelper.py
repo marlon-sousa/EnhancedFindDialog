@@ -91,11 +91,14 @@ class EnhancedFindDialog(
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 
 		sHelper = guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
+		hSizer = wx.BoxSizer(wx.HORIZONTAL)
 		# Translators: Dialog text for NvDA's find command.
 		textToFind = wx.StaticText(self, wx.ID_ANY, label=__("Type the text you wish to find"))
-		sHelper.addItem(textToFind)
+		hSizer.Add(textToFind, flag=wx.ALIGN_CENTER_VERTICAL)
+		hSizer.AddSpacer(guiHelper.SPACE_BETWEEN_ASSOCIATED_CONTROL_HORIZONTAL)
 		self.findTextField = wx.ComboBox(self, wx.ID_ANY, choices = searchEntries,style=wx.CB_DROPDOWN)
-		sHelper.addItem(self.findTextField)
+		hSizer.Add(self.findTextField)
+		sHelper.addItem(hSizer)
 		# if there is a previous list of searched entries, make sure we present the last searched term  selected by default
 		if searchEntries:
 			self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
