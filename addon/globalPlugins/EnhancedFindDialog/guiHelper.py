@@ -9,7 +9,7 @@ import config
 import core
 import cursorManager
 from . import cursorManagerHelper
-from gui import contextHelp
+from gui import contextHelp, guiHelper
 import wx
 
 # this addon mostly complements NVDA functionalities.
@@ -91,29 +91,35 @@ class EnhancedFindDialog(
 
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 
-		findSizer = wx.BoxSizer(wx.HORIZONTAL)
+		sHelper = guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
+		hSizer = wx.BoxSizer(wx.HORIZONTAL)
 		# Translators: Dialog text for NvDA's find command.
 		textToFind = wx.StaticText(self, wx.ID_ANY, label=__("Type the text you wish to find"))
-		findSizer.Add(textToFind)
+		hSizer.Add(textToFind, flag=wx.ALIGN_CENTER_VERTICAL)
+		hSizer.AddSpacer(guiHelper.SPACE_BETWEEN_ASSOCIATED_CONTROL_HORIZONTAL)
 		self.findTextField = wx.ComboBox(self, wx.ID_ANY, choices = searchEntries,style=wx.CB_DROPDOWN)
-
+		hSizer.Add(self.findTextField)
+		sHelper.addItem(hSizer)
 		# if there is a previous list of searched entries, make sure we present the last searched term  selected by default
 		if searchEntries:
 			self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
-		findSizer.Add(self.findTextField)
-		mainSizer.Add(findSizer,border=20,flag=wx.LEFT|wx.RIGHT|wx.TOP)
+
 		# Translators: An option in find dialog to perform case-sensitive search.
 		self.caseSensitiveCheckBox=wx.CheckBox(self,wx.ID_ANY,label=__("Case &sensitive"))
 		self.caseSensitiveCheckBox.SetValue(caseSensitivity)
+		sHelper.addItem(self.caseSensitiveCheckBox)
 		self.caseSensitiveCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
-		mainSizer.Add(self.caseSensitiveCheckBox,border=10,flag=wx.BOTTOM)
+
 		# Translators: An option in find dialog to perform search wrapping
 		self.searchWrapCheckBox=wx.CheckBox(self,wx.ID_ANY,label=_("Search &wrap"))
 		self.searchWrapCheckBox.SetValue(searchWrap)
+		sHelper.addItem(self.searchWrapCheckBox)
 		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
-		mainSizer.Add(self.searchWrapCheckBox,border=10,flag=wx.BOTTOM)
 
-		mainSizer.Add(self.CreateButtonSizer(wx.OK|wx.CANCEL), flag=wx.ALIGN_RIGHT)
+		sHelper.addDialogDismissButtons(self.CreateButtonSizer(wx.OK | wx.CANCEL))
+
+		mainSizer.Add(sHelper.sizer, border=guiHelper.BORDER_FOR_DIALOGS, flag=wx.ALL)
+
 		self.Bind(wx.EVT_BUTTON,self.onOk,id=wx.ID_OK)
 		self.Bind(wx.EVT_BUTTON,self.onCancel,id=wx.ID_CANCEL)
 
@@ -175,4 +181,3 @@ class EnhancedFindDialog(
 
 	def _truncateSearchHistory(self, entries):
 		del entries[SEARCH_HISTORY_LEAST_RECENT_INDEX:]
-
