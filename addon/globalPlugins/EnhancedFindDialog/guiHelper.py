@@ -75,9 +75,10 @@ class EnhancedFindDialog(
 
 	helpId = "SearchingForText"
 
-	def __init__(self, parent, cursorManager, profile, searchEntries):
+	def __init__(self, parent, cursorManager, profile, searchEntries, reverseSearch):
 		# Translators: Title of a dialog to find text.
 		super().__init__(parent, title=__("Find"))
+		self.reverseSearch = reverseSearch
 		# if checkboxes change during this dialog we need to save the profile with the new values
 		self._mustSaveProfile = False
 		# Have a copy of the active cursor manager, as this is needed later for finding text.
@@ -169,7 +170,7 @@ class EnhancedFindDialog(
 
 		# We must use core.callLater rather than wx.CallLater to ensure that the callback runs within NVDA's core pump.
 		# If it didn't, and it directly or indirectly called wx.Yield, it could start executing NVDA's core pump from within the yield, causing recursion.
-		core.callLater(100, cursorManagerHelper.doFindText, self.activeCursorManager, text, caseSensitive=caseSensitive, searchWrap = searchWrap)
+		core.callLater(100, cursorManagerHelper.doFindText, self.activeCursorManager, text, caseSensitive=caseSensitive, searchWrap = searchWrap, reverse = self.reverseSearch)
 		self.Destroy()
 
 	def onCancel(self, evt):
