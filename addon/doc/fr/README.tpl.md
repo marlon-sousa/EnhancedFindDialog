@@ -135,7 +135,7 @@ Remerciement spécial à
 * Rémy Ruiz - Traduction Espagnol
 * Rémy Ruiz - Traduction Français
 * Tarik Hadžirović - Traduction Croate
-*  Thiago Seus - Traduction Portugais Brésil
+*  Thiago Seus - Traduction Portugais Brésil, compatibilité avec NVDA 2024.1
 * Umut KORKMAZ - Traduction turc
 * Valentin Kupriyanov - Traduction Russe
 * Ivan Shtefuriak - Traduction Ukrainien

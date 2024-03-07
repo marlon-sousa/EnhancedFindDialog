@@ -135,7 +135,7 @@ Special thanks to
 * Rémy Ruiz - French translation
 * Rémy Ruiz - Spanish translation
 * Tarik Hadžirović - Croatian translation
-*  Thiago Seus - Brazilian Portuguese translation
+*  Thiago Seus - Brazilian Portuguese translation, NVDA 2024.1 compatibility
 * Umut KORKMAZ - Turkish translation
 * Valentin Kupriyanov - Russian translation
 * Ivan Shtefuriak - Ukrainian translation

@@ -132,7 +132,7 @@ Agradecimentos a:
 * Rémy Ruiz - Tradução para Espanhol
 * Rémy Ruiz - Tradução para Francês
 * Tarik Hadžirović - Tradução para Croata
-*  Thiago Seus - Tradução para Português Brasileiro
+*  Thiago Seus - Tradução para Português Brasileiro e compatibilidade com NVDA 2024.1
 * Umut KORKMAZ - tradução para Turco
 * Valentin Kupriyanov - tradução para Russo
 * Ivan Shtefuriak - tradução Ucraniana

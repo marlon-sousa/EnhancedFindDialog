@@ -135,7 +135,7 @@ Bu eklentiye katkıda bulunmak veya bu eklentiyi çevirmek istiyorsanız, lütfe
 * Rémy Ruiz - Fransızca çeviri
 * Rémy Ruiz - İspanyolca çeviri  
 * Tarik Hadžirović - Hırvatça çeviri
-*  Thiago Seus - Brezilya Portekizcesi çeviri  
+*  Thiago Seus - Brezilya Portekizcesi çeviri, NVDA 2024.1 ile uyumluluk
 * Umut KORKMAZ - Türkçe Çeviri  
 * Valentin Kupriyanov - Rusça çeviri  
 * Ivan Shtefuriak - Ukraynaca çeviri

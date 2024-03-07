@@ -20,7 +20,7 @@ addon_info = {
 	"addon_description" : _("""This addon introduces improvements to the NVDA find dialog.
 It is now possible to have your previous searches history available on a list during the NVDA session, which will enable you to quickly select and search for previous searched terms."""),
 	# version
-	"addon_version" : "1.4.2",
+	"addon_version" : "1.5.0",
 	# Author(s)
 	"addon_author" : u"Marlon Brandão de Sousa <marlon.bsousa@gmail.com>",
 	# URL for the add-on documentation support
