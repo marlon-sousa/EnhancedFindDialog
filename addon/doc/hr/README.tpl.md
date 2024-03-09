@@ -133,7 +133,7 @@ Posebna zahvala za
 * Rémy Ruiz - španjolski prijevod
 * Rémy Ruiz - francuski prijevod
 * Tarik Hadžirović - hrvatski prijevod
-* Thiago Seus - brazilski portugalski prijevod
+* Thiago Seus - brazilski portugalski prijevod, kompatibilnost s NVDA 2024.1
 * Umut KORKMAZ - turski prijevod
 * Valentin Kupriyanov - ruski prijevod
 * Ivan Shtefuriak - ukrajinski prijevod

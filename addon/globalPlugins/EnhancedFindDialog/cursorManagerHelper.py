@@ -5,6 +5,7 @@
 #See the file COPYING.txt for more details.
 
 import addonHandler
+import buildVersion
 import config
 import controlTypes
 from cursorManager import CursorManager
@@ -37,6 +38,15 @@ addonHandler.initTranslation()
 # search history list constants
 SEARCH_HISTORY_MOST_RECENT_INDEX = 0
 SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
+
+
+# Workaround to support the new find error dialog title introduced in NVDA 2024.1
+if buildVersion.version_year > 2023:
+	# Translators: message dialog title displayed to the user when
+	# searching text and no text is found.
+	FIND_ERROR_DIALOG_TITLE = __("0 matches")
+else:
+	FIND_ERROR_DIALOG_TITLE = __("Find Error")
 
 
 def patchCursorManager():
@@ -107,7 +117,7 @@ def doFindText(cursorManagerInstance, text,reverse=False,caseSensitive=False, se
 		if not willSayAllResume:
 			speech.speakTextInfo(info,reason=controlTypes.OutputReason.CARET)
 	else:
-		wx.CallAfter(gui.messageBox, __('text "%s" not found')%text, __("Find Error"), wx.OK | wx.ICON_ERROR)
+		wx.CallAfter(gui.messageBox, __('text "%s" not found')%text, FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR)
 	CursorManager._lastFindText=text
 	CursorManager._lastCaseSensitivity=caseSensitive
 	CursorManager._searchWrap = searchWrap
