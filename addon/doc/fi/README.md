@@ -4,7 +4,7 @@ Paranneltu Etsi-valintaikkuna -lisäosa toteuttaa seuraavat haun parannukset:
 * Hakuhistoria
 * Profiilikohtainen haun aloittaminen alusta asiakirjan lopussa
 * Profiilikohtainen kirjainkoko
-* Kontekstuaaliset tiedot hakujen yhteydessä
+* Tilannekohtaiset tiedot hakujen yhteydessä
 
 ## Lataaminen
 Lataa [Paranneltu Etsi-valintaikkuna 1.5.0 -lisäosa](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/1.5.0/EnhancedFindDialog-1.5.0.nvda-addon)
@@ -24,7 +24,7 @@ Valitettavasti NVDA ei säilytä luetteloa aiemmista hakusanoista. Tämä hidast
 
 Tämä lisäosa säilyttää hakuhistorian niin kauan kuin NVDA on käynnissä. Joten voit suorittaa uuden haun vain avaamalla Etsi-valintaikkunan ja valitsemalla aiemmin haetun hakusanan painamalla alanuolinäppäintä.
 
-Voit tietenkin myös kirjoittaa uusia hakusanoja. Ne lisätään luetteloon seuraavalla Etsi-valintaikkunan avaamiskerralla.
+Voit tietenkin myös kirjoittaa uusia hakusanoja. Ne näkyvät luettelossa seuraavalla Etsi-valintaikkunan avaamiskerralla.
 
 #### Miten se toimii?
 
@@ -48,10 +48,10 @@ Asenna lisäosa. Kun se on käytössä, Etsi-valintaikkunassa on "Aloita haku al
 
 Kun se on valittuna:
 
-1. Jos etsimäsi teksti löytyy senhetkisen sijainnin alapuolelta, kohdistus siirretään kyseiseen kohtaan.
-2. Jos etsimääsi tekstiä ei löydy senhetkisen sijainnin alapuolelta, sitä etsitään yläpuolelta.
-3. Jos teksti löytyy, lisäosa ilmoittaa lyhyellä äänimerkillä, että löydetty teksti on senhetkisen sijainnin yläpuolella ja kohdistus siirretään sen kohdalle.
-4. Jos tekstiä ei löydy, siitä näytetään ilmoitus.
+1. Jos etsimäsi hakusana löytyy senhetkisen sijaintisi alapuolelta, kohdistus siirretään kyseiseen kohtaan.
+2. Jos etsimääsi hakusanaa ei löydy senhetkisen sijaintisi alapuolelta, sitä etsitään yläpuolelta.
+3. Jos hakusana löytyy, lisäosa ilmoittaa lyhyellä äänimerkillä, että löydetty teksti on senhetkisen sijainnin yläpuolella ja kohdistus siirretään sen kohdalle.
+4. Jos hakusanaa ei löydy, siitä näytetään ilmoitus.
 
 Tämän valintaruudun tilan muuttaminen ja haun suorittaminen tallentavat uuden tilan (valittu tai ei valittu) käytössä olevaan profiiliin. Haun peruuttaminen ei muuta valintaruudun tilaa käytössä olevassa profiilissa, vaikka muuttaisit sitä ennen haun peruuttamista.
 
