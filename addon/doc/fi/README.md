@@ -32,9 +32,9 @@ Asenna lisäosa. Kun se on otettu käyttöön, voit liikkua Etsi-valintaikkunass
 
 Voit kirjoittaa uuden hakusanan tavalliseen tapaan milloin tahansa.
 
-### Kiertävä haku
+### Jatka hakua alusta
 
-Kiertävä haku on toiminto, joka ei käytössä ollessaan ota huomioon nykyistä tekstikohtaa hakuja suoritettaessa.
+Jatka hakua alusta on toiminto, joka ei käytössä ollessaan ota huomioon nykyistä tekstikohtaa hakuja suoritettaessa.
 
 Tämä tarkoittaa, että jos etsit jotain, mitä ei löydy nykyisen sijaintisi alapuolelta, haku suoritetaan tekstin alusta , jolloin hakusanaa etsitään koko tekstistä.
 
@@ -44,7 +44,7 @@ Tämä asetus on profiilikohtainen, mikä tarkoittaa, että voit käyttää prof
 
 #### Miten se toimii?
 
-Asenna lisäosa. Kun se on käytössä, Etsi-valintaikkunassa on "Aloita haku alusta" -valintaruutu.
+Asenna lisäosa. Kun se on käytössä, Etsi-valintaikkunassa on "Jatka hakua alusta" -valintaruutu.
 
 Kun se on valittuna:
 
