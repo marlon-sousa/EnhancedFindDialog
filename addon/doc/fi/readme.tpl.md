@@ -1,5 +1,6 @@
-# Paranneltu Etsi-valintaikkuna 1.5.0
-Paranneltu Etsi-valintaikkuna -lisäosa toteuttaa seuraavat haun parannukset:
+# Laajennettu Etsi-valintaikkuna ${addon_version}
+
+Laajennettu Etsi-valintaikkuna -lisäosa toteuttaa seuraavat haun parannukset:
 
 * Hakuhistoria
 * Profiilikohtainen haun aloittaminen alusta asiakirjan lopussa
@@ -7,7 +8,7 @@ Paranneltu Etsi-valintaikkuna -lisäosa toteuttaa seuraavat haun parannukset:
 * Tilannekohtaiset tiedot hakujen yhteydessä
 
 ## Lataaminen
-Lataa [Paranneltu Etsi-valintaikkuna 1.5.0 -lisäosa](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/1.5.0/EnhancedFindDialog-1.5.0.nvda-addon)
+Lataa [Laajennettu Etsi-valintaikkuna 1.5.0 -lisäosa](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/1.5.0/EnhancedFindDialog-1.5.0.nvda-addon)
 
 ## Ominaisuudet
 
