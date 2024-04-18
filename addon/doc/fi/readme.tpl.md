@@ -8,7 +8,7 @@ Laajennettu Etsi-valintaikkuna -lisäosa toteuttaa seuraavat haun parannukset:
 * Tilannekohtaiset tiedot hakujen yhteydessä
 
 ## Lataaminen
-Lataa [Laajennettu Etsi-valintaikkuna 1.5.0 -lisäosa](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/1.5.0/EnhancedFindDialog-1.5.0.nvda-addon)
+Lataa [Laajennettu Etsi-valintaikkuna ${addon_version} -lisäosa](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/${addon_version}/EnhancedFindDialog-${addon_version}.nvda-addon)
 
 ## Ominaisuudet
 
