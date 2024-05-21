@@ -5,19 +5,49 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <link rel="stylesheet" type="text/css" href="../style.css" media="screen"/>
-<title>Enhanced find dialog for NVDA 1.5.0</title>
+<title>Enhanced find dialog for NVDA 1.5.1</title>
 </head>
 <body>
 <h1>Contributing</h1>
 <h2>building the addon</h2>
+<h3>Local environment</h3>
+<p>Although not mandatory, we suggest you perform the following:</p>
+<ol>
+<li>Clone NVDA in a folder at the same level as this project.<br />
+For example, if this project is cloned at c:\projects\EnhancedFindDialog, NVDA should be cloned at c:\projects\nvda.<br />
+Perform a clone with the --recursive flag. If NVDA is already cloned, make sure it is up to date, fetching and then synchronizing the master branch with the NVDA upstream master branch.<br />
+Perform a git submodule update --init command to make sure git submodules are correctly synchronized.</li>
+<li>Perform a git checkout in the release-2024.1 tag in the NVDA project. You don't need to build NVDA, just having the source code at the release branch is enough.</li>
+<li>Install visual studio code, if it is not installed. Although you can use other environments, the optimal setup requires visual studio code.</li>
+<li>Open the EnhancedFindDialog folder in VS Code. From command line, perform the "code ." command, or use the file / open folder menus on visual studio code itself and select the folder where this project is cloned.</li>
+<li>Use ctrl + shift + x to access the extensions widget in Visual studio code. Tab umtil the recomended section and install the recomended extensions.</li>
+<li>Restart visual studio code.</li>
+<li>Now, whenever you are navigating through code, pressing f12 in a NVDA object should take you to its source in NVDA project.</li>
+</ol>
+<h3>Dependencies</h3>
 <p>You will need:</p>
 <ul>
-<li>python 3.6 or above.</li>
+<li>python 3.11.</li>
 <li>pip must be configured</li>
 <li>scons (pip install scons)</li>
 <li>markdown (pip install markdown)</li>
 <li>msgfmt utility. The easiest way of getting it is by installing git bash and choosing to include bash tools at command prompt</li>
 </ul>
+<h4>Pre-commit</h4>
+<p>It is strongly recomended that you install pre-commit.</p>
+<ul>
+<li>pip imstall pre-commit</li>
+<li>pre-commit install</li>
+</ul>
+<p>This will imstall pre-commit and configure its hooks, so that whenever you perform a commit several checks will apply.<br />
+Should any of them fail, the commit will not be allowed.
+This helps to ensure your commits have quality. You can bypass the check, however be aware that a pull request check will also apply these same checks and merge will be disabled should any of them fail, even if someone approves the pull request.</p>
+<p>You can trigger the pre-commit checks at any time without performing a commit by issuing "pre-commit run --all-files".</p>
+<h4>Flake8</h4>
+<p>One of the pre-commit hooks is flake8, a python linter which, ammong other things, help to make sure the project has a consistent formating and that good practices are in place.</p>
+<p>Visual Studio code recomended extensions include flake8, so that you can be warned while editing code when something needs to be fixed.</p>
+<p>The visual studio code extension and the pre-commit flake8 hooks use the same configuration.</p>
+<h3>building</h3>
 <p>Once you have everything installed, issuing scons at the root of the project should build the addon and generate docs.</p>
 <h2>translations</h2>
 <h3>translating the addon</h3>
