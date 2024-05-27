@@ -4,6 +4,7 @@
 # This file is covered by the GNU General Public License.
 # See the file COPYING.txt for more details.
 
+from enum import Enum, unique
 import addonHandler
 import config
 import core
@@ -11,6 +12,9 @@ import core
 from . import cursorManagerHelper
 from gui import contextHelp, guiHelper
 import wx
+
+from logHandler import log
+
 
 # this addon mostly complements NVDA functionalities.
 # however, because the way NVDA works, when you use
@@ -74,6 +78,41 @@ def setConfig(profile, key, value):
 	profile[module][key] = value
 
 
+class InvalidTypeName(Exception):
+	pass
+
+
+@unique
+class SearchType(Enum):
+	# Translators: normal
+	NORMAL = _("normal")
+	# Translators: regular expression
+	REGULAR_EXPRESSION = _("regular expression")
+
+	@staticmethod
+	def getByIndex(index):
+		return list(SearchType)[index]
+
+	@staticmethod
+	def getIndexByName(name):
+		log.debug(f"searching for {name}")
+		for index, type in enumerate(SearchType):
+			if type.name == name:
+				return index
+		raise InvalidTypeName(f"No variant with name '{name}' found in SearchType Enum")
+
+	@staticmethod
+	def getByName(name):
+		for type in SearchType:
+			if type.name == name:
+				return type
+		raise InvalidTypeName(f"No variant with name '{name}' found in SearchType Enum")
+
+
+def getSearchTypes():
+	return [i.value for i in SearchType]
+
+
 class EnhancedFindDialog(contextHelp.ContextHelpMixin,
                          wx.Dialog):  # Noqa: E101
 	"""A dialog used to specify text to find in a cursor manager.
@@ -93,9 +132,15 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		# this is needed because whenever the find dialog is opened the default profile is loaded. We, however, want
 		# to retrieve state from the active profile when the find dialog was loaded
 		self.profile = profile
-		caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
-		searchWrap = strToBool(getConfig(profile, "searchWrap"))
+		self.caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
+		self.searchWrap = strToBool(getConfig(profile, "searchWrap"))
+		self.searchType = SearchType.getByName(getConfig(profile, "searchType")).name
+		self.buildGui(searchEntries)
+		self.updateUi()
+		self.bindEvents()
 
+	def buildGui(self, searchEntries):
+		log.debug("called buildGui")
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 
 		sHelper = guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
@@ -111,30 +156,55 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		# present the last searched term  selected by default
 		if searchEntries:
 			self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
-
+		searchTypeHelper = guiHelper.BoxSizerHelper(
+			self, orientation=wx.HORIZONTAL)
+		self._searchTypeCtrl = searchTypeHelper.addItem(wx.RadioBox(
+			self,
+			# Translators: A radio box to select the search type.
+			label=__("Search type"), choices=getSearchTypes(),
+			majorDimension=1, style=wx.RA_SPECIFY_ROWS))
+		sHelper.addItem(searchTypeHelper)
 		# Translators: An option in find dialog to perform case-sensitive search.
 		self.caseSensitiveCheckBox = wx.CheckBox(self, wx.ID_ANY, label=__("Case &sensitive"))
-		self.caseSensitiveCheckBox.SetValue(caseSensitivity)
 		sHelper.addItem(self.caseSensitiveCheckBox)
-		self.caseSensitiveCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 
 		# Translators: An option in find dialog to perform search wrapping
 		self.searchWrapCheckBox = wx.CheckBox(self, wx.ID_ANY, label=_("Search &wrap"))
-		self.searchWrapCheckBox.SetValue(searchWrap)
 		sHelper.addItem(self.searchWrapCheckBox)
-		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 
 		sHelper.addDialogDismissButtons(self.CreateButtonSizer(wx.OK | wx.CANCEL))
 
 		mainSizer.Add(sHelper.sizer, border=guiHelper.BORDER_FOR_DIALOGS, flag=wx.ALL)
 
-		self.Bind(wx.EVT_BUTTON, self.onOk, id=wx.ID_OK)
-		self.Bind(wx.EVT_BUTTON, self.onCancel, id=wx.ID_CANCEL)
-
 		mainSizer.Fit(self)
 		self.SetSizer(mainSizer)
 		self.CentreOnScreen()
 		self.findTextField.SetFocus()
+
+	def updateUi(self):
+		log.debug("called update ui")
+		self.caseSensitiveCheckBox.SetValue(self.caseSensitivity)
+		self.searchWrapCheckBox.SetValue(self.searchWrap)
+		self._searchTypeCtrl.SetSelection(SearchType.getIndexByName(self.searchType))
+		if(self.searchType == SearchType.NORMAL.name):
+			self.caseSensitiveCheckBox.Enable(True)
+		else:
+			self.caseSensitiveCheckBox.Enable(False)
+
+	def bindEvents(self):
+		log.debug("called bind events")
+		self.Bind(wx.EVT_BUTTON, self.onOk, id=wx.ID_OK)
+		self.Bind(wx.EVT_BUTTON, self.onCancel, id=wx.ID_CANCEL)
+		self.caseSensitiveCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+		self._searchTypeCtrl.Bind(wx.EVT_RADIOBOX, self.OnSearchTypeChanged)
+		self.self._searchTypeCtrl.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+
+	def OnSearchTypeChanged(self, evt):
+		log.debug("called OnSearchTypeChanged")
+		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
+		self.updateUi()
+		self.onStatChange(evt)
 
 	def updateSearchEntries(self, searchEntries, currentSearchTerm):
 		if not currentSearchTerm:
@@ -166,31 +236,44 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		searchEntries.insert(SEARCH_HISTORY_MOST_RECENT_INDEX, currentSearchTerm)
 
 	def onOk(self, evt):
+		log.debug("called onOk")
 		text = self.findTextField.GetValue()
 		# update the list of searched entries so that it can be exibited in the next find dialog call
 		self.updateSearchEntries(self.activeCursorManager._searchEntries, text)
 
-		caseSensitive = self.caseSensitiveCheckBox.GetValue()
-		setConfig(self.profile, "searchCaseSensitivity", caseSensitive)
+		self.caseSensitive = self.caseSensitiveCheckBox.GetValue()
 
-		searchWrap = self.searchWrapCheckBox.GetValue()
-		setConfig(self.profile, "searchWrap", searchWrap)
+		self.searchWrap = self.searchWrapCheckBox.GetValue()
 
-		if self._mustSaveProfile:
-			scheduleProfileSave(self.profile)
+		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
+
+		self.updateProfile()
 
 		# We must use core.callLater rather than wx.CallLater to
 		# ensure that the callback runs within NVDA's core pump.
 		# If it didn't, and it directly or indirectly called wx.Yield, it
 		# could start executing NVDA's core pump from within the yield, causing recursion.
-		core.callLater(100, cursorManagerHelper.doFindText, self.activeCursorManager, text,
-		               caseSensitive=caseSensitive, searchWrap=searchWrap, reverse=self.reverseSearch)  # Noqa: E101
+		core.callLater(
+			100, cursorManagerHelper.doFindText, self.activeCursorManager, text,
+			caseSensitive=self.caseSensitive, searchWrap=self.searchWrap,
+			reverse=self.reverseSearch)  # Noqa: E101
 		self.Destroy()
 
 	def onCancel(self, evt):
+		log.debug("called onCancel")
 		self.Destroy()
 
+	def updateProfile(self):
+		log.debug("called updateProfile")
+		setConfig(self.profile, "searchType", self.searchType)
+		setConfig(self.profile, "searchCaseSensitivity", self.caseSensitiveCheckBox.GetValue())
+		setConfig(self.profile, "searchWrap", self.searchWrapCheckBox.GetValue())
+
+		if self._mustSaveProfile:
+			scheduleProfileSave(self.profile)
+
 	def onStatChange(self, evt):
+		log.debug("called onStatChange")
 		self._mustSaveProfile = True
 
 	def _truncateSearchHistory(self, entries):
