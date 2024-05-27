@@ -18,6 +18,7 @@ def initConfiguration():
 	confspec = {
 		"searchCaseSensitivity": "boolean( default=False)",
 		"searchWrap": "boolean( default=False)",
+		"searchType": "string( default='NORMAL')",
 	}
 	config.conf.spec[module] = confspec
 
