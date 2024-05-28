@@ -198,7 +198,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.caseSensitiveCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self._searchTypeCtrl.Bind(wx.EVT_RADIOBOX, self.OnSearchTypeChanged)
-		self.self._searchTypeCtrl.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+		self._searchTypeCtrl.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 
 	def OnSearchTypeChanged(self, evt):
 		log.debug("called OnSearchTypeChanged")
