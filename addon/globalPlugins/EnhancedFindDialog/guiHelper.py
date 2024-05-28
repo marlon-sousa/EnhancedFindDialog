@@ -161,7 +161,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self._searchTypeCtrl = searchTypeHelper.addItem(wx.RadioBox(
 			self,
 			# Translators: A radio box to select the search type.
-			label=__("Search type"), choices=getSearchTypes(),
+			label=_("Search type:"), choices=getSearchTypes(),
 			majorDimension=1, style=wx.RA_SPECIFY_ROWS))
 		sHelper.addItem(searchTypeHelper)
 		# Translators: An option in find dialog to perform case-sensitive search.
