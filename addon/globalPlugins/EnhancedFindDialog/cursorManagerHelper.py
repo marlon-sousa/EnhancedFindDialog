@@ -51,7 +51,6 @@ if buildVersion.version_year > 2023:
 else:
 	FIND_ERROR_DIALOG_TITLE = __("Find Error")
 
-
 def patchCursorManager():
 	#  History of search terms.
 	# Sorted in most to least recently searched order.
