@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 'EnhancedFindDialog' '1.4.1'\n"
 "Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
 "POT-Creation-Date: 2023-06-04 16:25+0300\n"
-"PO-Revision-Date: 2024-04-07 21:46+0300\n"
+"PO-Revision-Date: 2024-04-18 15:37+0300\n"
 "Last-Translator: Jani Kinnunen <janikinnunen340@gmail.com>\n"
 "Language-Team: fi_FI <janikinnunen340@gmail.com>\n"
 "Language: fi\n"
@@ -27,7 +27,7 @@ msgstr "&Jatka hakua alusta"
 #. Translators: Summary for this add-on to be shown on installation and add-on information.
 #: buildVars.py:17
 msgid "Enhanced find dialog for NVDA"
-msgstr "Paranneltu Etsi-valintaikkuna"
+msgstr "Laajennettu Etsi-valintaikkuna"
 
 #. Add-on description
 #. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
