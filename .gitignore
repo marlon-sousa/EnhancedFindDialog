@@ -11,3 +11,4 @@ addon/doc/**/*.md
 *.py[co]
 *.nvda-addon
 .sconsign.dblite
+/addon/doc/en
