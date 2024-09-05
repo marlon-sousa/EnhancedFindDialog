@@ -168,3 +168,4 @@ Agradecimentos a:
 * Umut KORKMAZ - tradução para Turco
 * Valentin Kupriyanov - tradução para Russo
 * Ivan Shtefuriak - tradução para Ucraniano
+* Leonardo Marenda - tradução para Italiano
