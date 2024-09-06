@@ -136,3 +136,4 @@ Agradecimentos a:
 * Umut KORKMAZ - tradução para Turco
 * Valentin Kupriyanov - tradução para Russo
 * Ivan Shtefuriak - tradução Ucraniana
+* Leonardo Marenda - tradução Italiana

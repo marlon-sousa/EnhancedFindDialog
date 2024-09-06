@@ -139,3 +139,4 @@ Bu eklentiye katkıda bulunmak veya bu eklentiyi çevirmek istiyorsanız, lütfe
 * Umut KORKMAZ - Türkçe Çeviri  
 * Valentin Kupriyanov - Rusça çeviri  
 * Ivan Shtefuriak - Ukraynaca çeviri
+* Leonardo Marenda - Italiana çeviri

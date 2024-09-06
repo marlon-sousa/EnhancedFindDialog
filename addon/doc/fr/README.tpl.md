@@ -139,3 +139,4 @@ Remerciement spécial à
 * Umut KORKMAZ - Traduction turc
 * Valentin Kupriyanov - Traduction Russe
 * Ivan Shtefuriak - Traduction Ukrainien
+* Leonardo Marenda - Traduction Italien
