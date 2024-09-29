@@ -39,6 +39,10 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	# for example, when calling the find dialog we need to show the enhanced version provided by this addon
 	# the CursorManager mixin also needs to have functionality added
 	def injectProcessing(self):
+		# Don't inject on secure screens as the addon can write to configuration
+		if globalVars.appArgs.secure:
+			return
+
 		# add utility method to ConfigManager class to allow us to get the active profile in a higher level
 		if not hasattr(config.ConfigManager, "getActiveProfile"):
 			config.ConfigManager.getActiveProfile = getActiveProfile
