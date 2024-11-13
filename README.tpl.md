@@ -143,4 +143,5 @@ Special thanks to
 * Umut KORKMAZ - Turkish translation
 * Valentin Kupriyanov - Russian translation
 * Ivan Shtefuriak - Ukrainian translation
+* Jani Kinnunen - Finnish translation
 * Leonardo Marenda - Italian translation
