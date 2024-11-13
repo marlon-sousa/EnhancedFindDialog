@@ -1,4 +1,4 @@
-# Paranneltu Etsi-valintaikkuna 1.5.0
+# Paranneltu Etsi-valintaikkuna ${addon_version}
 Paranneltu Etsi-valintaikkuna -lisäosa toteuttaa seuraavat haun parannukset:
 
 * Hakuhistoria
@@ -7,7 +7,7 @@ Paranneltu Etsi-valintaikkuna -lisäosa toteuttaa seuraavat haun parannukset:
 * Tilannekohtaiset tiedot hakujen yhteydessä
 
 ## Lataaminen
-Lataa [Paranneltu Etsi-valintaikkuna 1.5.0 -lisäosa](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/1.5.0/EnhancedFindDialog-1.5.0.nvda-addon)
+Lataa [Paranneltu Etsi-valintaikkuna ${addon_version} -lisäosa](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/${addon_version}/EnhancedFindDialog-${addon_version}.nvda-addon)
 
 ## Ominaisuudet
 
@@ -44,7 +44,7 @@ Tämä asetus on profiilikohtainen, mikä tarkoittaa, että voit käyttää prof
 
 #### Miten se toimii?
 
-Asenna lisäosa. Kun se on käytössä, Etsi-valintaikkunassa on "Jatka hakua alusta" -valintaruutu.
+Kun lisäosa on käytössä, Etsi-valintaikkunassa on "Jatka hakua alusta" -valintaruutu.
 
 Kun se on valittuna:
 
@@ -61,7 +61,7 @@ NVDA tarjoaa jo "Sama kirjainkoko" -valintaruudun, jotta hakuja voidaan tehdä k
 
 #### Miten se toimii?
 
-Asenna lisäosa. "Sama kirjainkoko" -valintaruudun tilan muuttaminen ja haun suorittaminen tallentavat uuden tilan (valittu tai ei valittu) käytössä olevaan profiiliin. Haun peruuttaminen ei muuta valintaruudun tilaa käytössä olevassa profiilissa, vaikka muuttaisit sitä ennen haun peruuttamista.
+"Sama kirjainkoko" -valintaruudun tilan muuttaminen ja haun suorittaminen tallentavat uuden tilan (valittu tai ei valittu) käytössä olevaan profiiliin. Haun peruuttaminen ei muuta valintaruudun tilaa käytössä olevassa profiilissa, vaikka muuttaisit sitä ennen haun peruuttamista.
 
 ### Hakujen tilannekohtaiset tiedot
 
@@ -95,7 +95,7 @@ Marlon roskapostittajaksi
 
 vastaus Marlonille
 
-Tämä vähentäisi tuottavuuttasi, koska ensin kuulisit vain "Marlon", etkä tietäisi mitään tästä esiintymästä.
+Tämä vähentäisi tuottavuuttasi, koska kuulisit ensin vain "Marlon", etkä tietäisi mitään tästä esiintymästä.
 
 Seuraavalla kerralla kuulisit "Marlon" ja sinun olisi odotettava, että "roskapostittajaksi" puhutaan, koska et tietäisi, miten tämä teksti liittyy Marloniin.
 
@@ -105,9 +105,7 @@ Lisäksi, jos painaisit nopeasti NVDA+F3, kuulisit "Marlon, Marlon, Marlon, Marl
 
 #### Miten se toimii?
 
-Asenna lisäosa.
-
-Kun se on asennettu, rivi, jolla senhetkinen löytynyt hakusana on, luetaan ja kohdistus siirretään hakusanan kohdalle.
+Kun lisäosa on käytössä, rivi, jolla senhetkinen löytynyt hakusana on, luetaan ja kohdistus siirretään hakusanan kohdalle.
 
 Edellisessä esimerkissämme ensimmäisellä hakukerralla kuulisit
 
@@ -141,3 +139,4 @@ Erityiskiitokset seuraaville:
 * Valentin Kupriyanov - venäjänkielinen käännös
 * Ivan Shtefuriak - ukrainankielinen käännös
 * Jani Kinnunen - suomenkielinen käännös
+* Leonardo Marenda - italiankielinen käännös

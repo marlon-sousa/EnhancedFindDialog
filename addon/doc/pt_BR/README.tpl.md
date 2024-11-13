@@ -9,6 +9,10 @@ Complemento que melhora o diálogo de busca:
 ## Download
 Baixe o [Complemento para o Diálogo de Busca Estendido ${addon_version}](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/${addon_version}/EnhancedFindDialog-${addon_version}.nvda-addon)
 
+## Nota sobre o modo seguro
+
+Como o complemento necessita escrever na configuração do NVDA para fornecer seus recursos, suas funcionalidades serão desabilitadas em modo seguro. Em seu lugar, o diálogo original de busca do NVDA será utilizado.
+
 ## Recursos
 
 ### Histórico de busca
@@ -168,3 +172,4 @@ Agradecimentos a:
 * Umut KORKMAZ - tradução para Turco
 * Valentin Kupriyanov - tradução para Russo
 * Ivan Shtefuriak - tradução para Ucraniano
+* Leonardo Marenda - tradução para Italiano

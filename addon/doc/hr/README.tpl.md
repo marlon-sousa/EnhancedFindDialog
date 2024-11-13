@@ -137,3 +137,4 @@ Posebna zahvala za
 * Umut KORKMAZ - turski prijevod
 * Valentin Kupriyanov - ruski prijevod
 * Ivan Shtefuriak - ukrajinski prijevod
+* Leonardo Marenda - Italiski prijevod
