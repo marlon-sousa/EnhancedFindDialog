@@ -11,10 +11,10 @@ import controlTypes
 from cursorManager import CursorManager
 import gui
 from . import guiHelper
+import inspect
 import re
-from speech import sayAll
 import speech
-from scriptHandler import willSayAllResume
+from scriptHandler import willSayAllResume, script
 import textInfos
 from tones import beep
 import wx
@@ -159,9 +159,15 @@ def performSearch(cursorManager, text, info, reverse, caseSensitive, wrapSearch)
 
 
 # Patch say all functionality.
-# This is necessary to do after patching because
-# the patched script loses the reference to the decorated say all
-# from NVDA, losing the attribute.
-script_enhancedFind.resumeSayAllMode = sayAll.CURSOR.CARET
-script_enhancedFindNext.resumeSayAllMode = sayAll.CURSOR.CARET
-script_EnhancedFindPrevious.resumeSayAllMode = sayAll.CURSOR.CARET
+# Fix the patched script losing the reference to the decorated say all,
+# documentation and other necessary attributes for the gesture
+def _copyScriptAttributes(oldScript, newScript):
+	for parameterName in inspect.signature(script).parameters.keys():
+		attributeName = "__doc__" if parameterName == "description" else parameterName
+		if hasattr(oldScript, attributeName):
+			setattr(newScript, attributeName, getattr(oldScript, attributeName))
+
+
+_copyScriptAttributes(CursorManager.script_find, script_enhancedFind)
+_copyScriptAttributes(CursorManager.script_findNext, script_enhancedFindNext)
+_copyScriptAttributes(CursorManager.script_findPrevious, script_EnhancedFindPrevious)
