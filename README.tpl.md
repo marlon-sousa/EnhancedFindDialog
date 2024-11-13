@@ -9,6 +9,10 @@ Enhanced find dialog addon for NVDA, implementing search improvements:
 ## Download
 Download the [Enhanced Find Dialog ${addon_version} addon](https://github.com/marlon-sousa/EnhancedFindDialog/releases/download/${addon_version}/EnhancedFindDialog-${addon_version}.nvda-addon)
 
+## Note about secure mode
+
+As the addon requires access to write to NVDA configuration to work, all its features will be disabled in secure mode. Instead, the original NVDA find dialog will be used in this mode.
+
 ## Features
 
 ### Search history
