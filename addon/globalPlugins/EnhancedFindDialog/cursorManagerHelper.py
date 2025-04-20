@@ -12,6 +12,7 @@ import controlTypes
 from cursorManager import CursorManager
 import gui
 import textInfos.offsets
+import textUtils
 from . import guiHelper
 from .searchHistory import SearchHistory
 from .searchType import SearchType
@@ -71,6 +72,10 @@ def patchCursorManager():
 	CursorManager.script_findPrevious = script_EnhancedFindPrevious
 	CursorManager.supportsRegexpSearch = supportsRegexpSearch
 	CursorManager.getSearchEntries = getSearchEntries
+
+
+def patchOffsetsTextInfo():
+	setattr(textInfos.offsets.OffsetsTextInfo, "findRegexp", findRegexp)
 
 
 def script_enhancedFind(self, gesture, reverse=False):
@@ -136,6 +141,7 @@ def getMostRecentSearchTerm():
 
 def doFindText(cursorManagerInstance, searchTerm,
                reverse=False, caseSensitive=False, searchWrap=False, willSayAllResume=False):  # noqa: E101
+	log.debug("doFindText, reverse=%s, caseSensitive=%s, searchWrap=%s", reverse, caseSensitive, searchWrap)
 	if not searchTerm:
 		return
 
@@ -157,6 +163,7 @@ def doFindText(cursorManagerInstance, searchTerm,
 
 
 def performSearch(cursorManager, searchTerm, info, reverse, caseSensitive, wrapSearch):
+	log.info("performSearch, reverse=%s, caseSensitive=%s, wrapSearch=%s", reverse, caseSensitive, wrapSearch)
 	res = find(cursorManager, searchTerm, info, reverse=reverse, caseSensitive=caseSensitive)
 	# if either not interested in search wrapping or we have found a result then we are done here
 	if not wrapSearch or res:
@@ -193,10 +200,34 @@ def find(cursorManager, searchTerm, info, reverse, caseSensitive):
 					FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
 				)
 				return None
-			res = info.findRegexp(searchTerm.text, reverse=reverse, caseSensitive=caseSensitive)	
+			res = info.findRegexp(searchTerm.text, reverse=reverse)
 		else:
 			res = info.find(searchTerm.text, reverse=reverse, caseSensitive=caseSensitive)
 		return res
+
+
+def findRegexp(self, text, reverse=False):
+	if reverse:
+		log.info('backward')
+		log.info(0)
+		log.info(self._startOffset)
+		inText = self._getTextRange(0, self._startOffset)
+		matches = list(re.finditer(text, inText, re.UNICODE))
+		if not matches:
+			return False
+		m = matches[-1]
+	else:
+		log.info('forward')
+		log.info(self._startOffset + 1)
+		log.info(self._getStoryLength())
+		inText = self._getTextRange(self._startOffset + 1, self._getStoryLength())
+		m = re.search(text, inText, re.UNICODE)
+	if not m:
+		return False
+	converter = textUtils.getOffsetConverter(self.encoding)(inText)
+	offset = self._startOffset + 1 + converter.strToEncodedOffsets(m.start())
+	self._startOffset = self._endOffset = offset
+	return True
 
 
 # Patch say all functionality.
