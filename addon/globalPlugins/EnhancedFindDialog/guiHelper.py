@@ -8,12 +8,16 @@ from enum import Enum, unique
 import addonHandler
 import config
 import core
+import gui
 
 from . import cursorManagerHelper
+from .searchHistory import SearchHistory, SearchTerm
+from .searchType import SearchType
 from gui import contextHelp, guiHelper
 import wx
 
 from logHandler import log
+import re
 
 
 # this addon mostly complements NVDA functionalities.
@@ -78,41 +82,6 @@ def setConfig(profile, key, value):
 	profile[module][key] = value
 
 
-class InvalidTypeName(Exception):
-	pass
-
-
-@unique
-class SearchType(Enum):
-	# Translators: normal
-	NORMAL = _("normal")
-	# Translators: regular expression
-	REGULAR_EXPRESSION = _("regular expression")
-
-	@staticmethod
-	def getByIndex(index):
-		return list(SearchType)[index]
-
-	@staticmethod
-	def getIndexByName(name):
-		log.debug(f"searching for {name}")
-		for index, type in enumerate(SearchType):
-			if type.name == name:
-				return index
-		raise InvalidTypeName(f"No variant with name '{name}' found in SearchType Enum")
-
-	@staticmethod
-	def getByName(name):
-		for type in SearchType:
-			if type.name == name:
-				return type
-		raise InvalidTypeName(f"No variant with name '{name}' found in SearchType Enum")
-
-
-def getSearchTypes():
-	return [i.value for i in SearchType]
-
-
 class EnhancedFindDialog(contextHelp.ContextHelpMixin,
                          wx.Dialog):  # Noqa: E101
 	"""A dialog used to specify text to find in a cursor manager.
@@ -120,9 +89,10 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 
 	helpId = "SearchingForText"
 
-	def __init__(self, parent, cursorManager, profile, searchEntries, reverseSearch):
+	def __init__(self, parent, cursorManager, profile, reverseSearch):
 		# Translators: Title of a dialog to find text.
 		super().__init__(parent, title=__("Find"))
+		self.searchHistory = SearchHistory.get()
 		self.reverseSearch = reverseSearch
 		# if checkboxes change during this dialog we need to save the profile with the new values
 		self._mustSaveProfile = False
@@ -135,12 +105,16 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
 		self.searchWrap = strToBool(getConfig(profile, "searchWrap"))
 		self.searchType = SearchType.getByName(getConfig(profile, "searchType")).name
-		self.buildGui(searchEntries)
+		self.buildGui()
 		self.updateUi()
 		self.bindEvents()
 
-	def buildGui(self, searchEntries):
+	def buildGui(self):
 		log.debug("called buildGui")
+		supportsRegexp = self.activeCursorManager.supportsRegexpSearch()
+		searchEntries = self.searchHistory.getItems(None if supportsRegexp else SearchType.NORMAL.name)
+		# if the search type is not supported, remove it from the list of search entries
+		searchTerms = [entry.text for entry in searchEntries]
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 
 		sHelper = guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
@@ -149,7 +123,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		textToFind = wx.StaticText(self, wx.ID_ANY, label=__("Type the text you wish to find"))
 		hSizer.Add(textToFind, flag=wx.ALIGN_CENTER_VERTICAL)
 		hSizer.AddSpacer(guiHelper.SPACE_BETWEEN_ASSOCIATED_CONTROL_HORIZONTAL)
-		self.findTextField = wx.ComboBox(self, wx.ID_ANY, choices=searchEntries, style=wx.CB_DROPDOWN)
+		self.findTextField = wx.ComboBox(self, wx.ID_ANY, choices=searchTerms, style=wx.CB_DROPDOWN)
 		hSizer.Add(self.findTextField)
 		sHelper.addItem(hSizer)
 		# if there is a previous list of searched entries, make sure we
@@ -161,7 +135,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self._searchTypeCtrl = searchTypeHelper.addItem(wx.RadioBox(
 			self,
 			# Translators: A radio box to select the search type.
-			label=_("Search type:"), choices=getSearchTypes(),
+			label=_("Search type:"), choices=SearchType.getSearchTypes(),
 			majorDimension=1, style=wx.RA_SPECIFY_ROWS))
 		sHelper.addItem(searchTypeHelper)
 		# Translators: An option in find dialog to perform case-sensitive search.
@@ -185,6 +159,9 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		log.debug("called update ui")
 		self.caseSensitiveCheckBox.SetValue(self.caseSensitivity)
 		self.searchWrapCheckBox.SetValue(self.searchWrap)
+		if not self.activeCursorManager.supportsRegexpSearch():
+			self.searchType = SearchType.NORMAL.name
+			self._searchTypeCtrl.Enable(False)
 		self._searchTypeCtrl.SetSelection(SearchType.getIndexByName(self.searchType))
 		if(self.searchType == SearchType.NORMAL.name):
 			self.caseSensitiveCheckBox.Enable(True)
@@ -206,46 +183,35 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.updateUi()
 		self.onStatChange(evt)
 
-	def updateSearchEntries(self, searchEntries, currentSearchTerm):
-		if not currentSearchTerm:
-			return
-		if not searchEntries:
-			searchEntries.insert(SEARCH_HISTORY_MOST_RECENT_INDEX, currentSearchTerm)
-			return
-		# we can not accept entries that differ only on text case
-		# because of a wxComboBox limitation on MS Windows
-		# see https://wxpython.org/Phoenix/docs/html/wx.ComboBox.html
-		# notice also that python 2 does not offer caseFold functionality
-		# so lower is the best we can have for comparing strings
-		for index, item in enumerate(searchEntries):
-			if(item.lower() == currentSearchTerm.lower()):
-				# if the user has selected a previous search term in the list or retyped
-				# an already listed term ,we need to make sure the
-				# current search term becomes the first item of the list, so that it
-				# will appear
-				# selected by default when the dialog is
-				# shown again. If the current search term
-				# differs from the current item only in case letters, we will choose to store the
-				# new search as we can not store both.
-				searchEntries.pop(index)
-				searchEntries.insert(SEARCH_HISTORY_MOST_RECENT_INDEX, currentSearchTerm)
-				return
-		# not yet listed. Save it.
-		if len(searchEntries) > SEARCH_HISTORY_LEAST_RECENT_INDEX:
-			self._truncateSearchHistory(searchEntries)
-		searchEntries.insert(SEARCH_HISTORY_MOST_RECENT_INDEX, currentSearchTerm)
+	def updateSearchHistory(self, currentSearchText):
+		if not currentSearchText:
+			return None
+		searchTerm = SearchTerm(currentSearchText, self.searchType)
+		self.searchHistory.append(searchTerm)
+		return searchTerm
 
 	def onOk(self, evt):
 		log.debug("called onOk")
 		text = self.findTextField.GetValue()
-		# update the list of searched entries so that it can be exibited in the next find dialog call
-		self.updateSearchEntries(self.activeCursorManager._searchEntries, text)
-
+		if self.searchType == SearchType.REGULAR_EXPRESSION.name:
+			try:	
+				re.compile(text)
+			except re.error:
+				wx.CallAfter(gui.messageBox,
+					# Translators: Message shown when an invalid regular expression is entered.
+					_("The entered text is not a valid regular expression."),
+					cursorManagerHelper.FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
+				)  # Noqa E101
+				return
+		
 		self.caseSensitive = self.caseSensitiveCheckBox.GetValue()
 
 		self.searchWrap = self.searchWrapCheckBox.GetValue()
 
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
+
+		# update the list of searched entries so that it can be exibited in the next find dialog call
+		searchTerm = self.updateSearchHistory(text)
 
 		self.updateProfile()
 
@@ -254,7 +220,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		# If it didn't, and it directly or indirectly called wx.Yield, it
 		# could start executing NVDA's core pump from within the yield, causing recursion.
 		core.callLater(
-			100, cursorManagerHelper.doFindText, self.activeCursorManager, text,
+			100, cursorManagerHelper.doFindText, self.activeCursorManager, searchTerm,
 			caseSensitive=self.caseSensitive, searchWrap=self.searchWrap,
 			reverse=self.reverseSearch)  # Noqa: E101
 		self.Destroy()
