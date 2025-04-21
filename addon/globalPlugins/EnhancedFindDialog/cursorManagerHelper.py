@@ -209,23 +209,17 @@ def find(cursorManager, searchTerm, info, reverse, caseSensitive):
 def findRegexp(self, text, reverse=False):
 	if reverse:
 		log.info('backward')
-		log.info(0)
-		log.info(self._startOffset)
 		inText = self._getTextRange(0, self._startOffset)
 		matches = list(re.finditer(text, inText, re.UNICODE))
 		if not matches:
 			return False
 		m = matches[-1]
 	else:
-		log.info('forward')
-		log.info(self._startOffset + 1)
-		log.info(self._getStoryLength())
 		inText = self._getTextRange(self._startOffset + 1, self._getStoryLength())
 		m = re.search(text, inText, re.UNICODE)
 	if not m:
 		return False
-	converter = textUtils.getOffsetConverter(self.encoding)(inText)
-	offset = self._startOffset + 1 + converter.strToEncodedOffsets(m.start())
+	offset = m.start()
 	self._startOffset = self._endOffset = offset
 	return True
 
