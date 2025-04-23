@@ -208,7 +208,6 @@ def find(cursorManager, searchTerm, info, reverse, caseSensitive):
 
 def findRegexp(self, text, reverse=False):
 	if reverse:
-		log.info('backward')
 		inText = self._getTextRange(0, self._startOffset)
 		matches = list(re.finditer(text, inText, re.UNICODE))
 		if not matches:
@@ -219,7 +218,14 @@ def findRegexp(self, text, reverse=False):
 		m = re.search(text, inText, re.UNICODE)
 	if not m:
 		return False
-	offset = m.start()
+
+	converter = textUtils.getOffsetConverter(self.encoding)(inText)
+
+	if reverse:
+		offset = converter.strToEncodedOffsets(m.start())
+	else:
+		offset = self._startOffset + 1 + converter.strToEncodedOffsets(m.start())
+
 	self._startOffset = self._endOffset = offset
 	return True
 
