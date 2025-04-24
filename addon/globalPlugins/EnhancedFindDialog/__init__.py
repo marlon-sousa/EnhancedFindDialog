@@ -52,5 +52,5 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 		# add methods to CursorManager class
 		cursorManagerHelper.patchCursorManager()
-		# add methods to offsetsTextInfo class 
+		# add methods to offsetsTextInfo class
 		cursorManagerHelper.patchOffsetsTextInfo()

@@ -95,7 +95,9 @@ def script_enhancedFind(self, gesture, reverse=False):
 
 def script_enhancedFindNext(self, gesture):
 	mostRecentSearchTerm = getMostRecentSearchTerm()
-	if mostRecentSearchTerm is None or (mostRecentSearchTerm.searchType == SearchType.REGULAR_EXPRESSION.name and not self.supportsRegexpSearch()):
+	if (mostRecentSearchTerm is None
+				or (mostRecentSearchTerm.searchType == SearchType.REGULAR_EXPRESSION.name
+					and not self.supportsRegexpSearch())):
 		self.script_find(gesture)
 		return
 	doFindText(
@@ -109,7 +111,9 @@ def script_enhancedFindNext(self, gesture):
 
 def script_EnhancedFindPrevious(self, gesture):
 	mostRecentSearchTerm = getMostRecentSearchTerm()
-	if mostRecentSearchTerm is None or (mostRecentSearchTerm.searchType == SearchType.REGULAR_EXPRESSION.name and not self.supportsRegexpSearch()):
+	if (mostRecentSearchTerm is None
+				or (mostRecentSearchTerm.searchType == SearchType.REGULAR_EXPRESSION.name
+					and not self.supportsRegexpSearch())):
 		self.script_find(gesture, reverse=True)
 		return
 	doFindText(
@@ -201,18 +205,18 @@ def performSearch(cursorManager, searchTerm, info, reverse, caseSensitive, wrapS
 
 
 def find(cursorManager, searchTerm, info, reverse, caseSensitive):
-		if searchTerm.searchType == SearchType.REGULAR_EXPRESSION.name:
-			if not cursorManager.supportsRegexpSearch():
-				wx.CallAfter(
-					# Translators: Message shown when an invalid regular expression is entered.
-					_("current textInfo backend does not support regular expression searches"),
-					FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
-				)
-				return None
-			res = info.findRegexp(searchTerm.text, reverse=reverse)
-		else:
-			res = info.find(searchTerm.text, reverse=reverse, caseSensitive=caseSensitive)
-		return res
+	if searchTerm.searchType == SearchType.REGULAR_EXPRESSION.name:
+		if not cursorManager.supportsRegexpSearch():
+			wx.CallAfter(
+				# Translators: Message shown when an invalid regular expression is entered.
+				_("current textInfo backend does not support regular expression searches"),
+				FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
+			)
+			return None
+		res = info.findRegexp(searchTerm.text, reverse=reverse)
+	else:
+		res = info.find(searchTerm.text, reverse=reverse, caseSensitive=caseSensitive)
+	return res
 
 
 def findRegexp(self, text, reverse=False):

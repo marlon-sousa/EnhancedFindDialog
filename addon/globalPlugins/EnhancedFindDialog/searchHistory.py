@@ -30,8 +30,8 @@ class SearchHistory:
 		return list(filter(lambda t: t.searchType == searchType, self._terms))
 
 	def getItemByText(self, text):
-			return next((term for term in self._terms if term.text == text), None)
-	
+		return next((term for term in self._terms if term.text == text), None)
+
 	def append(self, term):
 		if not term.text:
 			return

@@ -4,7 +4,6 @@
 # This file is covered by the GNU General Public License.
 # See the file COPYING.txt for more details.
 
-from enum import Enum, unique
 import addonHandler
 import config
 import core
@@ -194,16 +193,17 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		log.debug("called onOk")
 		text = self.findTextField.GetValue()
 		if self.searchType == SearchType.REGULAR_EXPRESSION.name:
-			try:	
+			try:
 				re.compile(text)
 			except re.error:
-				wx.CallAfter(gui.messageBox,
+				wx.CallAfter(
+					gui.messageBox,
 					# Translators: Message shown when an invalid regular expression is entered.
 					_("The entered text is not a valid regular expression."),
 					cursorManagerHelper.FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
 				)  # Noqa E101
 				return
-		
+
 		self.caseSensitive = self.caseSensitiveCheckBox.GetValue()
 
 		self.searchWrap = self.searchWrapCheckBox.GetValue()
