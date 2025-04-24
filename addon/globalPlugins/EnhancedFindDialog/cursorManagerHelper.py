@@ -168,7 +168,6 @@ def doFindText(cursorManagerInstance, searchTerm,
 
 
 def performSearch(cursorManager, searchTerm, info, reverse, caseSensitive, wrapSearch):
-	log.info("performSearch, reverse=%s, caseSensitive=%s, wrapSearch=%s", reverse, caseSensitive, wrapSearch)
 	res = find(cursorManager, searchTerm, info, reverse=reverse, caseSensitive=caseSensitive)
 	# if either not interested in search wrapping or we have found a result then we are done here
 	if not wrapSearch or res:
@@ -190,7 +189,12 @@ def performSearch(cursorManager, searchTerm, info, reverse, caseSensitive, wrapS
 	info = cursorManager.makeTextInfo(textInfos.POSITION_CARET).copy()
 	info.expand(textInfos.UNIT_STORY)
 	inText = info._get_text()
-	found = re.search(re.escape(searchTerm.text), inText, (0 if caseSensitive else re.IGNORECASE) | re.UNICODE)
+
+	if searchTerm.searchType == SearchType.REGULAR_EXPRESSION.name:
+		found = re.search(searchTerm.text, inText, re.UNICODE)
+	else:
+		found = re.search(re.escape(searchTerm.text), inText, (0 if caseSensitive else re.IGNORECASE) | re.UNICODE)
+
 	if found:
 		beep(440, 30)
 	return found
