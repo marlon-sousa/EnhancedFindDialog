@@ -150,8 +150,13 @@ def doFindText(cursorManagerInstance, searchTerm,
 	if res:
 		cursorManagerInstance.selection = info
 		speech.cancelSpeech()
-		info.move(textInfos.UNIT_LINE, 1, endPoint="start")
-		info.expand(textInfos.UNIT_LINE)
+
+		if searchTerm.searchType == SearchType.REGULAR_EXPRESSION.name:
+			info.move(textInfos.UNIT_LINE, 1, endPoint="end")
+		else:
+			info.move(textInfos.UNIT_LINE, 1, endPoint="start")
+			info.expand(textInfos.UNIT_LINE)
+
 		if not willSayAllResume:
 			speech.speakTextInfo(info, reason=controlTypes.OutputReason.CARET)
 	else:
