@@ -22,7 +22,7 @@ It is now possible to have your previous searches history available on a list du
 	# version
 	"addon_version" : "1.6.1",
 	# Author(s)
-	"addon_author" : u"Marlon Brandão de Sousa <marlon.bsousa@gmail.com>",
+	"addon_author" : u"Marlon Brandão de Sousa <marlon.bsousa@gmail.com>, Thiago Seus <thiago.seus@yahoo.com.br>",
 	# URL for the add-on documentation support
 	"addon_url" : "https://github.com/marlon-sousa/EnhancedFindDialog",
 	# Documentation file name
