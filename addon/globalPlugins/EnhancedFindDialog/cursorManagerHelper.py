@@ -4,14 +4,20 @@
 # This file is covered by the GNU General Public License.
 # See the file COPYING.txt for more details.
 
+
 import addonHandler
 import buildVersion
 import config
 import controlTypes
 from cursorManager import CursorManager
 import gui
+import textInfos.offsets
+import textUtils
 from . import guiHelper
+from .searchHistory import SearchHistory
+from .searchType import SearchType
 import inspect
+from logHandler import log
 import re
 import speech
 from scriptHandler import willSayAllResume, script
@@ -64,6 +70,12 @@ def patchCursorManager():
 	CursorManager.script_find = script_enhancedFind
 	CursorManager.script_findNext = script_enhancedFindNext
 	CursorManager.script_findPrevious = script_EnhancedFindPrevious
+	CursorManager.supportsRegexpSearch = supportsRegexpSearch
+	CursorManager.getSearchEntries = getSearchEntries
+
+
+def patchOffsetsTextInfo():
+	setattr(textInfos.offsets.OffsetsTextInfo, "findRegexp", findRegexp)
 
 
 def script_enhancedFind(self, gesture, reverse=False):
@@ -75,19 +87,22 @@ def script_enhancedFind(self, gesture, reverse=False):
 		profile = config.conf.getActiveProfile()
 
 		gui.mainFrame.prePopup()
-		d = guiHelper.EnhancedFindDialog(gui.mainFrame, self, profile, self._searchEntries, reverse)
+		d = guiHelper.EnhancedFindDialog(gui.mainFrame, self, profile, reverse)
 		d.ShowModal()
 		gui.mainFrame.postPopup()
 	wx.CallAfter(run)
 
 
 def script_enhancedFindNext(self, gesture):
-	if not self._searchEntries:
+	mostRecentSearchTerm = getMostRecentSearchTerm()
+	if (mostRecentSearchTerm is None
+				or (mostRecentSearchTerm.searchType == SearchType.REGULAR_EXPRESSION.name
+					and not self.supportsRegexpSearch())):
 		self.script_find(gesture)
 		return
 	doFindText(
 		self,
-		self._searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX],
+		mostRecentSearchTerm,
 		caseSensitive=self._lastCaseSensitivity,
 		searchWrap=self._searchWrap,
 		willSayAllResume=willSayAllResume(gesture),
@@ -95,12 +110,15 @@ def script_enhancedFindNext(self, gesture):
 
 
 def script_EnhancedFindPrevious(self, gesture):
-	if not self._searchEntries:
+	mostRecentSearchTerm = getMostRecentSearchTerm()
+	if (mostRecentSearchTerm is None
+				or (mostRecentSearchTerm.searchType == SearchType.REGULAR_EXPRESSION.name
+					and not self.supportsRegexpSearch())):
 		self.script_find(gesture, reverse=True)
 		return
 	doFindText(
 		self,
-		self._searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX],
+		mostRecentSearchTerm,
 		reverse=True,
 		caseSensitive=self._lastCaseSensitivity,
 		searchWrap=self._searchWrap,
@@ -108,35 +126,58 @@ def script_EnhancedFindPrevious(self, gesture):
 	)
 
 
-def doFindText(cursorManagerInstance, text,
+def supportsRegexpSearch(self):
+	info = self.makeTextInfo(textInfos.POSITION_CARET)
+	return isinstance(info, textInfos.offsets.OffsetsTextInfo)
+
+
+def getSearchEntries(self):
+	searchHistory = SearchHistory.get()
+	if self.supportsRegexpSearch():
+		return searchHistory.getItems()
+	return searchHistory.getItems(searchType="normal")
+
+
+def getMostRecentSearchTerm():
+	searchHistory = SearchHistory.get()
+	return searchHistory.getMostRecent()
+
+
+def doFindText(cursorManagerInstance, searchTerm,
                reverse=False, caseSensitive=False, searchWrap=False, willSayAllResume=False):  # noqa: E101
-	if not text:
+	log.debug("doFindText, reverse=%s, caseSensitive=%s, searchWrap=%s", reverse, caseSensitive, searchWrap)
+	if not searchTerm:
 		return
 
 	info = cursorManagerInstance.makeTextInfo(textInfos.POSITION_CARET)
-	res = performSearch(cursorManagerInstance, text, info, reverse, caseSensitive, searchWrap)
+	res = performSearch(cursorManagerInstance, searchTerm, info, reverse, caseSensitive, searchWrap)
 	if res:
 		cursorManagerInstance.selection = info
 		speech.cancelSpeech()
-		info.move(textInfos.UNIT_LINE, 1, endPoint="start")
-		info.expand(textInfos.UNIT_LINE)
+
+		if searchTerm.searchType == SearchType.REGULAR_EXPRESSION.name:
+			info.move(textInfos.UNIT_LINE, 1, endPoint="end")
+		else:
+			info.move(textInfos.UNIT_LINE, 1, endPoint="start")
+			info.expand(textInfos.UNIT_LINE)
+
 		if not willSayAllResume:
 			speech.speakTextInfo(info, reason=controlTypes.OutputReason.CARET)
 	else:
-		wx.CallAfter(gui.messageBox, __('text "%s" not found') % text,
+		wx.CallAfter(gui.messageBox, __('text "%s" not found') % searchTerm.text,
 		             FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR)  # Noqa E101
-	CursorManager._lastFindText = text
+	CursorManager._lastFindText = searchTerm.text
 	CursorManager._lastCaseSensitivity = caseSensitive
 	CursorManager._searchWrap = searchWrap
 
 
-def performSearch(cursorManager, text, info, reverse, caseSensitive, wrapSearch):
-	res = info.find(text, reverse=reverse, caseSensitive=caseSensitive)
+def performSearch(cursorManager, searchTerm, info, reverse, caseSensitive, wrapSearch):
+	res = find(cursorManager, searchTerm, info, reverse=reverse, caseSensitive=caseSensitive)
 	# if either not interested in search wrapping or we have found a result then we are done here
 	if not wrapSearch or res:
 		return res
 	found = False
-	while info.find(text, reverse=(not reverse), caseSensitive=caseSensitive):
+	while find(cursorManager, searchTerm, info, reverse=(not reverse), caseSensitive=caseSensitive):
 		found = True
 	if found:
 		beep(440, 30)
@@ -152,10 +193,54 @@ def performSearch(cursorManager, text, info, reverse, caseSensitive, wrapSearch)
 	info = cursorManager.makeTextInfo(textInfos.POSITION_CARET).copy()
 	info.expand(textInfos.UNIT_STORY)
 	inText = info._get_text()
-	found = re.search(re.escape(text), inText, (0 if caseSensitive else re.IGNORECASE) | re.UNICODE)
+
+	if searchTerm.searchType == SearchType.REGULAR_EXPRESSION.name:
+		found = re.search(searchTerm.text, inText, re.UNICODE)
+	else:
+		found = re.search(re.escape(searchTerm.text), inText, (0 if caseSensitive else re.IGNORECASE) | re.UNICODE)
+
 	if found:
 		beep(440, 30)
 	return found
+
+
+def find(cursorManager, searchTerm, info, reverse, caseSensitive):
+	if searchTerm.searchType == SearchType.REGULAR_EXPRESSION.name:
+		if not cursorManager.supportsRegexpSearch():
+			wx.CallAfter(
+				# Translators: Message shown when an invalid regular expression is entered.
+				_("current textInfo backend does not support regular expression searches"),
+				FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
+			)
+			return None
+		res = info.findRegexp(searchTerm.text, reverse=reverse)
+	else:
+		res = info.find(searchTerm.text, reverse=reverse, caseSensitive=caseSensitive)
+	return res
+
+
+def findRegexp(self, text, reverse=False):
+	if reverse:
+		inText = self._getTextRange(0, self._startOffset)
+		matches = list(re.finditer(text, inText, re.UNICODE))
+		if not matches:
+			return False
+		m = matches[-1]
+	else:
+		inText = self._getTextRange(self._startOffset + 1, self._getStoryLength())
+		m = re.search(text, inText, re.UNICODE)
+	if not m:
+		return False
+
+	converter = textUtils.getOffsetConverter(self.encoding)(inText)
+
+	if reverse:
+		offset = converter.strToEncodedOffsets(m.start())
+	else:
+		offset = self._startOffset + 1 + converter.strToEncodedOffsets(m.start())
+
+	self._startOffset = self._endOffset = offset
+	return True
 
 
 # Patch say all functionality.
