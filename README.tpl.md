@@ -2,6 +2,7 @@
 Enhanced find dialog addon for NVDA, implementing search improvements:
 
 * search history
+* Search by Regular Expressions
 * search wrapping, configured per profile
 * case sensitivity, configured per profile
 * contextual information on searches
@@ -35,6 +36,27 @@ You can of course type new terms. They will also be added to the list next time 
 Simply install the addon. When it is activated, pressing down and up arrows on the edit field on the search dialog will let you navigate through the list of previously searched terms.
 
 You can at any time type a new term as usual.
+
+### Search by Regular Expressions
+
+In addition to the normal search supported by NVDA, this addon supports searching by regular expressions. For more information on how to get started with Regular Expressions, you can see for example [the Regular Expression HowTo tutorial for Python](https://docs.python.org/3/howto/regex.html), however many other tutorials are available on the Internet.
+
+Regular Expressions are specially useful to find some text that can vary on a web page.
+
+This option is profile specific, meaning that you can have a profile where it is active and other where it isn't.
+
+Please note that due to underlying technological implementation differences, this feature is not available on all programs (for example Microsoft Office Word documents) that support NVDA's find dialog.
+
+#### How it works?
+
+Simply install the addon. When it is activated, the find dialog will offer a `Search Type` radio box with two search options:
+
+* **Normal search** will perform NVDA's default search functionality.
+
+* **Regular Expression Search** will perform the search by Regular Expressions. Simply enter the Regular Expression on the text box and NVDA will place the cursor on the next match.
+
+
+Changing this radio box and performing a search will save the new state (normal or Regular Expression search for the active profile. Canceling the search won't change its state on the active profile, even if you changed it before canceling the search.
 
 ### Search wrapping
 

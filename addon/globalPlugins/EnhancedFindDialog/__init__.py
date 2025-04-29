@@ -18,6 +18,7 @@ def initConfiguration():
 	confspec = {
 		"searchCaseSensitivity": "boolean( default=False)",
 		"searchWrap": "boolean( default=False)",
+		"searchType": "string( default='NORMAL')",
 	}
 	config.conf.spec[module] = confspec
 
@@ -51,3 +52,5 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 		# add methods to CursorManager class
 		cursorManagerHelper.patchCursorManager()
+		# add methods to offsetsTextInfo class
+		cursorManagerHelper.patchOffsetsTextInfo()
