@@ -1,28 +1,59 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Ukrainian translation for EnhancedFindDialog addon\n"
-"POT-Creation-Date: 2022-07-08 15:37+0300\n"
-"PO-Revision-Date: 2022-07-09 12:55+0300\n"
+"Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
+"POT-Creation-Date: 2025-05-02 17:33+0300\n"
+"PO-Revision-Date: 2025-05-02 17:38+0300\n"
 "Last-Translator: \n"
 "Language-Team: Ivan Shtefuriak ip0877@gmail.com\n"
 "Language: uk_UA\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
-"X-Generator: Poedit 3.1\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 3.6\n"
 "X-Poedit-Basepath: ../../../..\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: addon/globalPlugins/EnhancedFindDialog/guiHelper.py:110
+#. Translators: Message shown when an invalid regular expression is entered.
+#: addon\globalPlugins\EnhancedFindDialog\cursorManagerHelper.py:212
+msgid "current textInfo backend does not support regular expression searches"
+msgstr "поточний текстовий бекенд не підтримує пошук за регулярними виразами"
+
+#. Translators: A radio box to select the search type.
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:137
+msgid "Search type:"
+msgstr "Тип пошуку:"
+
+#. Translators: An option in find dialog to perform search wrapping
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:145
 msgid "Search &wrap"
 msgstr "&Циклічний пошук"
 
+#. Translators: Message shown when an invalid regular expression is entered.
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:202
+msgid "The entered text is not a valid regular expression."
+msgstr "Введений текст не є дійсним регулярним виразом."
+
+#. Translators: normal
+#: addon\globalPlugins\EnhancedFindDialog\searchType.py:41
+msgid "normal"
+msgstr "нормальний"
+
+#. Translators: regular expression
+#: addon\globalPlugins\EnhancedFindDialog\searchType.py:43
+msgid "regular expression"
+msgstr "регулярний вираз"
+
+#. Add-on summary, usually the user visible name of the addon.
+#. Translators: Summary for this add-on to be shown on installation and add-on information.
 #: buildVars.py:17
 msgid "Enhanced find dialog for NVDA"
 msgstr "Розширений діалог пошуку NVDA"
 
+#. Add-on description
+#. Translators: Long description to be shown for this add-on on add-on information from add-ons manager
 #: buildVars.py:20
 msgid ""
 "This addon introduces improvements to the NVDA find dialog.\n"
