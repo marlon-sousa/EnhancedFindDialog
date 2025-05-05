@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 'EnhancedFindDialog' '1.4.1'\n"
 "Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
-"POT-Creation-Date: 2023-06-04 16:25+0300\n"
-"PO-Revision-Date: 2024-04-07 21:46+0300\n"
+"POT-Creation-Date: 2025-04-30 00:16+0300\n"
+"PO-Revision-Date: 2025-04-30 00:32+0300\n"
 "Last-Translator: Jani Kinnunen <janikinnunen340@gmail.com>\n"
 "Language-Team: fi_FI <janikinnunen340@gmail.com>\n"
 "Language: fi\n"
@@ -16,12 +16,38 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.6\n"
+
+#. Translators: Message shown when an invalid regular expression is entered.
+#: addon\globalPlugins\EnhancedFindDialog\cursorManagerHelper.py:212
+msgid "current textInfo backend does not support regular expression searches"
+msgstr "Säännöllisten lausekkeiden hakuja ei tueta"
+
+#. Translators: A radio box to select the search type.
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:137
+#| msgid "Search &wrap"
+msgid "Search type:"
+msgstr "Haun t&yyppi:"
 
 #. Translators: An option in find dialog to perform search wrapping
-#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:114
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:145
 msgid "Search &wrap"
 msgstr "&Jatka hakua alusta"
+
+#. Translators: Message shown when an invalid regular expression is entered.
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:202
+msgid "The entered text is not a valid regular expression."
+msgstr "Syötetty teksti ei ole kelvollinen säännöllinen lauseke"
+
+#. Translators: normal
+#: addon\globalPlugins\EnhancedFindDialog\searchType.py:41
+msgid "normal"
+msgstr "Tava&llinen"
+
+#. Translators: regular expression
+#: addon\globalPlugins\EnhancedFindDialog\searchType.py:43
+msgid "regular expression"
+msgstr "Sää&nnöllinen lauseke"
 
 #. Add-on summary, usually the user visible name of the addon.
 #. Translators: Summary for this add-on to be shown on installation and add-on information.
@@ -39,6 +65,6 @@ msgid ""
 "search for previous searched terms."
 msgstr ""
 "Tämä lisäosa tuo parannuksia NVDA:n Etsi-valintaikkunaan.\n"
-"Nykyisen NVDA-istunnon aikana kertynyt hakuhistoria on nyt mahdollista "
-"saada näkyviin luettelona, mikä mahdollistaa aiempien hakujen   nopean "
+"Nykyisen NVDA-istunnon aikana kertynyt hakuhistoria on nyt mahdollista saada "
+"näkyviin luettelona, mikä mahdollistaa aiempien hakujen   nopean "
 "valitsemisen ja uudelleenhakemisen."
