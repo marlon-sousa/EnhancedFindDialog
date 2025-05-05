@@ -2,6 +2,7 @@
 Paranneltu Etsi-valintaikkuna -lisäosa toteuttaa seuraavat haun parannukset:
 
 * Hakuhistoria
+* Haku säännöllisillä lausekkeilla
 * Profiilikohtainen haun aloittaminen alusta asiakirjan lopussa
 * Profiilikohtainen kirjainkoko
 * Tilannekohtaiset tiedot hakujen yhteydessä
@@ -28,9 +29,30 @@ Voit tietenkin myös kirjoittaa uusia hakusanoja. Ne näkyvät luettelossa seura
 
 #### Miten se toimii?
 
-Asenna lisäosa. Kun se on otettu käyttöön, voit liikkua Etsi-valintaikkunassa hakukentän aiempien hakusanojen luettelossa painamalla ylä- ja alanuolinäppäimiä.
+Kun tämä lisäosa on käytössä, voit liikkua Etsi-valintaikkunassa hakukentän aiempien hakusanojen luettelossa painamalla ylä- ja alanuolinäppäimiä.
 
 Voit kirjoittaa uuden hakusanan tavalliseen tapaan milloin tahansa.
+
+### Haku säännöllisillä lausekkeilla
+
+Tämän lisäosan avulla voit käyttää NVDA:n tavallisen haun lisäksi myös säännöllisiin lausekkeisiin perustuvaa hakua. Lisätietoa säännöllisistä lausekkeista löydät esimerkiksi [Pythonin säännöllisten lausekkeiden oppaasta (englanniksi)](https://docs.python.org/3/howto/regex.html), mutta internetissä on saatavilla myös monia muita aihetta käsitteleviä oppaita.
+
+Säännölliset lausekkeet ovat erityisen hyödyllisiä silloin, kun haluat etsiä verkkosivulta tekstiä, jonka kirjoitusasu vaihtelee.
+
+Tämä asetus on profiilikohtainen, eli voit ottaa sen käyttöön yhdessä profiilissa ja pitää sen poissa käytöstä toisessa.
+
+Huom: Teknisten toteutuserojen vuoksi tämä toiminto ei ole käytettävissä kaikkialla, missä NVDA:n hakua tuetaan (esim. Microsoft Word -asiakirjoissa).
+
+#### Miten se toimii?
+
+Kun tämä lisäosa on käytössä, NVDA:n Etsi-valintaikkunassa näkyy uusi valintaryhmä nimeltä Haun tyyppi, jossa on kaksi vaihtoehtoa:
+
+* **Tavallinen** suorittaa NVDA:n oletushakutoiminnon.
+
+* **Säännöllinen lauseke** suorittaa haun säännöllisillä lausekkeilla. Kirjoita tekstikenttään haluamasi säännöllinen lauseke, ja NVDA siirtää kohdistuksen seuraavaan osumaan.
+
+
+Valinnan muuttaminen ja haun suorittaminen tallentaa uuden tilan (tavallinen tai säännöllinen lauseke) käytössä olevaan profiiliin. Jos peruutat haun, valinta ei tallennu profiiliin, vaikka olisit muuttanut haun tyyppiä ennen peruutusta.
 
 ### Jatka hakua alusta
 
@@ -44,16 +66,16 @@ Tämä asetus on profiilikohtainen, mikä tarkoittaa, että voit käyttää prof
 
 #### Miten se toimii?
 
-Kun lisäosa on käytössä, Etsi-valintaikkunassa on "Jatka hakua alusta" -valintaruutu.
+Kun tämä lisäosa on käytössä, Etsi-valintaikkunassa on "Jatka hakua alusta" -valintaruutu.
 
 Kun se on valittuna:
 
 1. Jos etsimäsi hakusana löytyy senhetkisen sijaintisi alapuolelta, kohdistus siirretään kyseiseen kohtaan.
 2. Jos etsimääsi hakusanaa ei löydy senhetkisen sijaintisi alapuolelta, sitä etsitään yläpuolelta.
-3. Jos hakusana löytyy, lisäosa ilmoittaa lyhyellä äänimerkillä, että löydetty teksti on senhetkisen sijainnin yläpuolella ja kohdistus siirretään sen kohdalle.
+3. Jos hakusana löytyy, lisäosa ilmoittaa lyhyellä merkkiäänellä, että löydetty teksti on senhetkisen sijainnin yläpuolella ja kohdistus siirretään sen kohdalle.
 4. Jos hakusanaa ei löydy, siitä näytetään ilmoitus.
 
-Tämän valintaruudun tilan muuttaminen ja haun suorittaminen tallentavat uuden tilan (valittu tai ei valittu) käytössä olevaan profiiliin. Haun peruuttaminen ei muuta valintaruudun tilaa käytössä olevassa profiilissa, vaikka muuttaisit sitä ennen haun peruuttamista.
+Valintaruudun tila tallennetaan käytössä olevaan profiiliin hakutoiminnon suorittamisen yhteydessä. Jos haku peruutetaan, muutoksia ei tallenneta, vaikka valintaruudun tilaa olisi vaihdettu.
 
 ### Sama kirjainkoko
 
@@ -61,65 +83,69 @@ NVDA tarjoaa jo "Sama kirjainkoko" -valintaruudun, jotta hakuja voidaan tehdä k
 
 #### Miten se toimii?
 
-"Sama kirjainkoko" -valintaruudun tilan muuttaminen ja haun suorittaminen tallentavat uuden tilan (valittu tai ei valittu) käytössä olevaan profiiliin. Haun peruuttaminen ei muuta valintaruudun tilaa käytössä olevassa profiilissa, vaikka muuttaisit sitä ennen haun peruuttamista.
+Kun muutat "Sama kirjainkoko" -valintaruudun tilaa ja suoritat haun, uusi tila (valittu tai ei valittu) tallennetaan aktiiviseen profiiliin. Jos peruutat haun, muutosta ei tallenneta, vaikka olisit muuttanut valintaruudun tilaa.
 
 ### Hakujen tilannekohtaiset tiedot
 
-NVDA käyttäytyy hakusanan löytyessä seuraavasti: kohdistus sijoitetaan hakusanan kohdalle ja rivi luetaan siitä eteenpäin.
+Tavallisesti NVDA siirtää kohdistimen haetun sanan kohdalle ja lukee siitä eteenpäin rivin loppuun.
 
-Tämä on aina ollut ongelmallista suoritettaessa useita hakuja NVDA+F3-näppäinkomennolla, koska ensimmäinen kuulemasi asia on itse hakusana, mikä on täysin tarpeetonta, koska hait sitä juuri.
+Tämä on ongelmallista suoritettaessa useita hakuja NVDA+F3-näppäinkomennolla, koska kuulet aina ensin vain käyttämäsi hakusanan, vaikka tiedät jo mikä se on.
 
-Tämä lisäosa sijoittaa kohdistimen hakusanan kohdalle, mutta sen sijaan että lukisi siitä eteenpäin, se lukee koko rivin, mikä antaa käsityksen siitä, mistä kohdasta kyseinen hakusana löytyi.
+Tämä lisäosa parantaa käytettävyyttä siten, että kun hakusana  löytyy, NVDA lukee koko rivin alusta alkaen, vaikka kohdistin siirretään edelleen itse hakusanan kohdalle. Näin saat heti tiedon, missä yhteydessä hakusana esiintyy.
 
-Oletetaan esimerkiksi, että etsit hakusanaa "Marlon", koska tiedät, että jossain on painike nimeltä "Kohdista Marlonille". Et halua etsiä hakusanaa "Kohdista", koska muitakin "kohdista XYZ" -nimisiä painikkeita on, ja haluat löytää vain "Kohdista Marlonille" -painikkeen.
+Oletetaan, että etsit sanaa Marlon, koska haluat löytää painikkeen nimeltä Target Marlon. Et halua hakea pelkkää "target"-sanaa, koska muita vastaavia painikkeita voi olla useita.
 
-Tässä on teksti:
+Alla on esimerkkiteksti:
 
-Poista Marlonin kommentit
+Delete Marlon comments
 
-Vastaa suoraan Marlonille
+Reply directly to Marlon
 
-Ilmoita Marlon roskapostittajaksi
+Report Marlon as spammer
 
-Kohdista vastaus Marlonille
+Target Marlon on a response
 
-Jos etsisit hakusanaa "Marlon" ennen tätä lohkoa, kuulisit
+Ilman tätä lisäosaa kuulisit haun suoritettuasi esimerkiksi vain:
 
-Marlonin kommentit
+Marlon comments
 
-Jos jatkaisit NVDA+F3:n painamista, kuulisit
+Marlon
 
-Marlonille
+Marlon as spammer
 
-Marlon roskapostittajaksi
+Marlon on a response
 
-vastaus Marlonille
+Tämä hidastaa käyttöä, koska et saa heti tietoa siitä, missä yhteydessä "Marlon" esiintyy.
 
-Tämä vähentäisi tuottavuuttasi, koska kuulisit ensin vain "Marlon", etkä tietäisi mitään tästä esiintymästä.
+Tätä lisäosaa käytettäessä NVDA lukee jokaisen rivin alusta alkaen:
 
-Seuraavalla kerralla kuulisit "Marlon" ja sinun olisi odotettava, että "roskapostittajaksi" puhutaan, koska et tietäisi, miten tämä teksti liittyy Marloniin.
+Delete Marlon comments
 
-Samoin seuraavalla kerralla sinun olisi odotettava, että "vastaus" puhutaan, koska et olisi varma, mitä siinä tekstissä puhutaan Marlonista.
+Reply directly to Marlon
 
-Lisäksi, jos painaisit nopeasti NVDA+F3, kuulisit "Marlon, Marlon, Marlon, Marlon...", mikä ei ole tuottavaa, koska tiedät etsiväsi Marlonia.
+Report Marlon as spammer
+
+Target Marlon on a response
+
+Jos painat nopeasti NVDA+F3, kuulet jokaisen rivin alun, mikä mahdollistaa sen, että voit painaa Enteriä heti kuullessasi oikean rivin alun (esim. "Target"), tietäen että "Marlon" esiintyy myöhemmin kyseisellä rivillä.
 
 #### Miten se toimii?
 
-Kun lisäosa on käytössä, rivi, jolla senhetkinen löytynyt hakusana on, luetaan ja kohdistus siirretään hakusanan kohdalle.
+Kun tämä lisäosa on käytössä, NVDA lukee aina koko rivin, vaikka kohdistin siirretään löytyneen hakusanan kohdalle.
 
-Edellisessä esimerkissämme ensimmäisellä hakukerralla kuulisit
+Edellistä esimerkkiä käyttääksemme kuulisit ensimmäisellä hakukerralla:
 
-Poista Marlonin kommentit
+Delete Marlon comments
 
-Jos jatkaisit NVDA+F3:n painamista, kuulisit
+Jos jatkat NVDA+F3:n painamista, kuulet:
 
-Vastaa suoraan Marlonille
+Reply directly to Marlon
 
-Ilmoita Marlon roskapostittajaksi
+Report Marlon as spammer
 
-Kohdista vastaus Marlonille
+Target Marlon on a response
 
-Lisäksi, jos painaisit nopeasti NVDA+F3, kuulisit jokaisen rivin alun, mikä mahdollistaisi nopean Enterin painamisen kohderivillä, koska tiedät, että "Marlon" on myöhemmin samalla rivillä.
+Jos siis painat toistuvasti NVDA+F3, kuulet jokaisen rivin alun, mikä auttaa nopeasti löytämään halutun kohdan ja painamaan Enteriä oikeassa kohdassa.
 
 ## Kehitykseen osallistuminen ja kääntäminen eri kielille
 
