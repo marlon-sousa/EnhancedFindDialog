@@ -8,20 +8,47 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 'EnhancedFindDialog' '1.5.1'\n"
 "Report-Msgid-Bugs-To: 'nvda-translations@groups.io'\n"
-"POT-Creation-Date: 2024-08-27 15:37+0200\n"
-"PO-Revision-Date: 2024-08-27 16:50+0200\n"
+"POT-Creation-Date: 2025-05-20 10:05+0200\n"
+"PO-Revision-Date: 2025-05-20 10:07+0200\n"
 "Last-Translator: NetB di Leonardo Marenda <posta@netb.pro>\n"
 "Language-Team: \n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.4\n"
+"X-Generator: Poedit 3.5\n"
+
+#. Translators: Message shown when an invalid regular expression is entered.
+#: addon\globalPlugins\EnhancedFindDialog\cursorManagerHelper.py:212
+msgid "current textInfo backend does not support regular expression searches"
+msgstr ""
+"L'attuale backend di textinfo non supporta le ricerche di espressione "
+"regolari"
+
+#. Translators: A radio box to select the search type.
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:137
+msgid "Search type:"
+msgstr "Tipo di ricerca"
 
 #. Translators: An option in find dialog to perform search wrapping
-#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:122
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:145
 msgid "Search &wrap"
 msgstr "Ricerca dall'&inizio"
+
+#. Translators: Message shown when an invalid regular expression is entered.
+#: addon\globalPlugins\EnhancedFindDialog\guiHelper.py:202
+msgid "The entered text is not a valid regular expression."
+msgstr "Il testo immesso non è un'espressione regolare valida."
+
+#. Translators: normal
+#: addon\globalPlugins\EnhancedFindDialog\searchType.py:41
+msgid "normal"
+msgstr "normale"
+
+#. Translators: regular expression
+#: addon\globalPlugins\EnhancedFindDialog\searchType.py:43
+msgid "regular expression"
+msgstr "espressione regolare"
 
 #. Add-on summary, usually the user visible name of the addon.
 #. Translators: Summary for this add-on to be shown on installation and add-on information.
@@ -40,6 +67,6 @@ msgid ""
 msgstr ""
 "Questo componente aggiuntivo introduce miglioramenti alla finestra di "
 "dialogo di ricerca di NVDA.\\n\n"
-"Tramite esso è possibile avere in un elenco la cronologia di quanto "
-"cercato nell'attuale sessione di NVDA, così da poter selezionare e "
-"ricercare nuovamente i termini."
+"Tramite esso è possibile avere in un elenco la cronologia di quanto cercato "
+"nell'attuale sessione di NVDA, così da poter selezionare e ricercare "
+"nuovamente i termini."
