@@ -4,14 +4,28 @@
 # This file is covered by the GNU General Public License.
 # See the file COPYING.txt for more details.
 
+from logHandler import log
 import config
 from . import cursorManagerHelper
 
 import globalPluginHandler
 import globalVars
 
+import os
+import logging
 
 module = "EnhancedFindDialog"
+
+ADDON_LOG_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "my_addon_shutdown.log")
+log.info("addon log file" + ADDON_LOG_FILE)
+
+# Configure a separate logger for your addon's shutdown messages
+shutdown_logger = logging.getLogger("my_addon_shutdown")
+shutdown_logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler(ADDON_LOG_FILE, mode='a')  # Use 'w' to overwrite on each NVDA start
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+shutdown_logger.addHandler(file_handler)
 
 
 def initConfiguration():
@@ -19,6 +33,7 @@ def initConfiguration():
 		"searchCaseSensitivity": "boolean( default=False)",
 		"searchWrap": "boolean( default=False)",
 		"searchType": "string( default='NORMAL')",
+		"useSearchHistory": "boolean( default=False)",
 	}
 	config.conf.spec[module] = confspec
 
@@ -34,6 +49,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	def __init__(self, *args, **kwargs):
 		super(GlobalPlugin, self).__init__(*args, **kwargs)
 		self.injectProcessing()
+
+	def terminate(self):
+		shutdown_logger.info('turned off')
 
 	# the method below is responsible for modifying NVDA behavior.
 	# we need that certain parts of NVDA behave differently than the original to insert our functionality

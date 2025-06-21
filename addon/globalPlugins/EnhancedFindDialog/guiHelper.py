@@ -65,7 +65,14 @@ def scheduleProfileSave(profile):
 
 # get config from default profile
 def getDefaultConfig(key):
-	return config.conf[module][key]
+	defaultProfile = config.conf.profiles[0]
+	try:
+		value = defaultProfile[module][key]
+	except KeyError:
+		# Not set in base profile, get default from spec
+		spec = config.conf.spec[module][key]
+		value = config.conf.validator.get_default_value(spec)
+	return value
 
 
 def getConfig(profile, key):
@@ -79,6 +86,13 @@ def setConfig(profile, key, value):
 	if module not in profile:
 		profile[module] = {}
 	profile[module][key] = value
+
+
+def setDefaultConfig(key, value):
+	defaultProfile = config.conf.profiles[0]
+	if module not in defaultProfile:
+		defaultProfile[module] = {}
+	defaultProfile[module][key] = value
 
 
 class EnhancedFindDialog(contextHelp.ContextHelpMixin,
@@ -103,6 +117,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.profile = profile
 		self.caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
 		self.searchWrap = strToBool(getConfig(profile, "searchWrap"))
+		self.useSearchHistory = strToBool(getDefaultConfig("useSearchHistory"))
 		self.searchType = SearchType.getByName(getConfig(profile, "searchType")).name
 		self.buildGui()
 		self.updateUi()
@@ -145,6 +160,21 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.searchWrapCheckBox = wx.CheckBox(self, wx.ID_ANY, label=_("Search &wrap"))
 		sHelper.addItem(self.searchWrapCheckBox)
 
+		searchHistoryHelper = guiHelper.BoxSizerHelper(
+			self, orientation=wx.HORIZONTAL)
+
+		self.useSearchHistoryCheckBox = wx.CheckBox(
+			self, wx.ID_ANY,
+			# Translators: An option in find dialog to save search history persistently
+			label=_("Use search history"))
+		self.removeSearchHistoryButton = wx.Button(
+			self, wx.ID_ANY,
+			# Translators: A button to remove search history.
+			label=_("Remove search history"))
+		searchHistoryHelper.addItem(self.useSearchHistoryCheckBox)
+		searchHistoryHelper.addItem(self.removeSearchHistoryButton)
+		sHelper.addItem(searchHistoryHelper)
+
 		sHelper.addDialogDismissButtons(self.CreateButtonSizer(wx.OK | wx.CANCEL))
 
 		mainSizer.Add(sHelper.sizer, border=guiHelper.BORDER_FOR_DIALOGS, flag=wx.ALL)
@@ -158,6 +188,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		log.debug("called update ui")
 		self.caseSensitiveCheckBox.SetValue(self.caseSensitivity)
 		self.searchWrapCheckBox.SetValue(self.searchWrap)
+		self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
 		if not self.activeCursorManager.supportsRegexpSearch():
 			self.searchType = SearchType.NORMAL.name
 			self._searchTypeCtrl.Enable(False)
@@ -175,11 +206,39 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self._searchTypeCtrl.Bind(wx.EVT_RADIOBOX, self.OnSearchTypeChanged)
 		self._searchTypeCtrl.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+		self.useSearchHistoryCheckBox.Bind(wx.EVT_CHECKBOX, self.onUseSearchHistory)
+		self.removeSearchHistoryButton.Bind(wx.EVT_BUTTON, self.onRemoveSearchHistory)
 
 	def OnSearchTypeChanged(self, evt):
 		log.debug("called OnSearchTypeChanged")
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
 		self.updateUi()
+		self.onStatChange(evt)
+
+	def onUseSearchHistory(self, evt):
+		log.debug("called onUseSearchHistory")
+		if self.useSearchHistoryCheckBox.GetValue():
+			log.debug("Use search history checked")
+			dlg = wx.MessageDialog(
+				None,
+				# Translators: Message shown when enabling persistent search history.
+				_("Do you want to use your search history?"),
+				# Translators: Title for the save search history confirmation dialog.
+				_("Confirm Use Search History"),
+				wx.OK | wx.CANCEL | wx.ICON_QUESTION
+			)
+			dlg.SetOKCancelLabels(
+				# Translators: Label for the confirm usage button
+				_("Confirm usage"),
+				# Translators: Label for the deny usage button
+				_("Deny usage"))
+			result = dlg.ShowModal()
+			dlg.Destroy()
+			self.useSearchHistory = (result == wx.ID_OK)
+		else:
+			self.useSearchHistory = False
+		self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
+		self.useSearchHistoryCheckBox.SetFocus()
 		self.onStatChange(evt)
 
 	def updateSearchHistory(self, currentSearchText):
@@ -239,8 +298,9 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 			scheduleProfileSave(self.profile)
 
 	def onStatChange(self, evt):
-		log.debug("called onStatChange")
+		log.debug(f"called onStatChange {self.useSearchHistory}")
 		self._mustSaveProfile = True
+		setDefaultConfig("useSearchHistory", self.useSearchHistory)
 
 	def _truncateSearchHistory(self, entries):
 		del entries[SEARCH_HISTORY_LEAST_RECENT_INDEX:]
