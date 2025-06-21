@@ -5,11 +5,11 @@
 # See the file COPYING.txt for more details.
 
 import addonHandler
-import config
 import core
 import gui
 
 from . import cursorManagerHelper
+from .configUtils import getConfig, getDefaultConfig, scheduleProfileSave, setConfig, setDefaultConfig, strToBool  # Noqa: E501
 from .searchHistory import SearchHistory, SearchTerm
 from .searchType import SearchType
 from gui import contextHelp, guiHelper
@@ -46,43 +46,11 @@ SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
 # case sensitivity and search wrapping checkboxes state will be persisted per profile
 # so we need to be able to get and set values from config
 
-module = "EnhancedFindDialog"
 
-
-def strToBool(value):
-	if not isinstance(value, str):
-		return value
-	return value == "True"
-
-
-# we need to mark profiles we updated for save, otherwise they will not be persisted
-def scheduleProfileSave(profile):
-	# default pprofile is always saved
-	if not profile.name:
-		return
-	config.conf._dirtyProfiles.add(profile.name)
-
-
-# get config from default profile
-def getDefaultConfig(key):
-	return config.conf[module][key]
-
-
-def getConfig(profile, key):
-	# if this is not set on current profile, use the default config values.
-	if module not in profile or key not in profile[module]:
-		return getDefaultConfig(key)
-	return profile[module][key]
-
-
-def setConfig(profile, key, value):
-	if module not in profile:
-		profile[module] = {}
-	profile[module][key] = value
-
-
-class EnhancedFindDialog(contextHelp.ContextHelpMixin,
-                         wx.Dialog):  # Noqa: E101
+class EnhancedFindDialog(
+	contextHelp.ContextHelpMixin,
+	wx.Dialog,  # Noqa: E101
+):
 	"""A dialog used to specify text to find in a cursor manager.
 	"""
 
@@ -103,6 +71,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.profile = profile
 		self.caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
 		self.searchWrap = strToBool(getConfig(profile, "searchWrap"))
+		self.useSearchHistory = strToBool(getDefaultConfig("useSearchHistory"))
 		self.searchType = SearchType.getByName(getConfig(profile, "searchType")).name
 		self.buildGui()
 		self.updateUi()
@@ -129,8 +98,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		# present the last searched term  selected by default
 		if searchEntries:
 			self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
-		searchTypeHelper = guiHelper.BoxSizerHelper(
-			self, orientation=wx.HORIZONTAL)
+		searchTypeHelper = guiHelper.BoxSizerHelper(self, orientation=wx.HORIZONTAL)
 		self._searchTypeCtrl = searchTypeHelper.addItem(wx.RadioBox(
 			self,
 			# Translators: A radio box to select the search type.
@@ -145,6 +113,20 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.searchWrapCheckBox = wx.CheckBox(self, wx.ID_ANY, label=_("Search &wrap"))
 		sHelper.addItem(self.searchWrapCheckBox)
 
+		searchHistoryHelper = guiHelper.BoxSizerHelper(self, orientation=wx.HORIZONTAL)
+
+		self.useSearchHistoryCheckBox = wx.CheckBox(
+			self, wx.ID_ANY,
+			# Translators: An option in find dialog to save search history persistently
+			label=_("Use search history"))
+		self.removeSearchHistoryButton = wx.Button(
+			self, wx.ID_ANY,
+			# Translators: A button to remove search history.
+			label=_("Remove search history"))
+		searchHistoryHelper.addItem(self.useSearchHistoryCheckBox)
+		searchHistoryHelper.addItem(self.removeSearchHistoryButton)
+		sHelper.addItem(searchHistoryHelper)
+
 		sHelper.addDialogDismissButtons(self.CreateButtonSizer(wx.OK | wx.CANCEL))
 
 		mainSizer.Add(sHelper.sizer, border=guiHelper.BORDER_FOR_DIALOGS, flag=wx.ALL)
@@ -158,11 +140,12 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		log.debug("called update ui")
 		self.caseSensitiveCheckBox.SetValue(self.caseSensitivity)
 		self.searchWrapCheckBox.SetValue(self.searchWrap)
+		self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
 		if not self.activeCursorManager.supportsRegexpSearch():
 			self.searchType = SearchType.NORMAL.name
 			self._searchTypeCtrl.Enable(False)
 		self._searchTypeCtrl.SetSelection(SearchType.getIndexByName(self.searchType))
-		if(self.searchType == SearchType.NORMAL.name):
+		if self.searchType == SearchType.NORMAL.name:
 			self.caseSensitiveCheckBox.Enable(True)
 		else:
 			self.caseSensitiveCheckBox.Enable(False)
@@ -175,11 +158,39 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self._searchTypeCtrl.Bind(wx.EVT_RADIOBOX, self.OnSearchTypeChanged)
 		self._searchTypeCtrl.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+		self.useSearchHistoryCheckBox.Bind(wx.EVT_CHECKBOX, self.onUseSearchHistory)
+		self.removeSearchHistoryButton.Bind(wx.EVT_BUTTON, self.onRemoveSearchHistory)
 
 	def OnSearchTypeChanged(self, evt):
 		log.debug("called OnSearchTypeChanged")
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
 		self.updateUi()
+		self.onStatChange(evt)
+
+	def onUseSearchHistory(self, evt):
+		log.debug("called onUseSearchHistory")
+		if self.useSearchHistoryCheckBox.GetValue():
+			log.debug("Use search history checked")
+			dlg = wx.MessageDialog(
+				None,
+				# Translators: Message shown when enabling persistent search history.
+				_("Do you want to use your search history?"),
+				# Translators: Title for the save search history confirmation dialog.
+				_("Confirm Use Search History"),
+				wx.OK | wx.CANCEL | wx.ICON_QUESTION
+			)
+			dlg.SetOKCancelLabels(
+				# Translators: Label for the confirm usage button
+				_("Confirm usage"),
+				# Translators: Label for the deny usage button
+				_("Deny usage"))
+			result = dlg.ShowModal()
+			dlg.Destroy()
+			self.useSearchHistory = (result == wx.ID_OK)
+		else:
+			self.useSearchHistory = False
+		self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
+		self.useSearchHistoryCheckBox.SetFocus()
 		self.onStatChange(evt)
 
 	def updateSearchHistory(self, currentSearchText):
@@ -198,16 +209,14 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 			except re.error:
 				wx.CallAfter(
 					gui.messageBox,
-					# Translators: Message shown when an invalid regular expression is entered.
+					#  Translators: Message shown when an invalid regular expression is entered.
 					_("The entered text is not a valid regular expression."),
 					cursorManagerHelper.FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
 				)  # Noqa E101
 				return
 
 		self.caseSensitive = self.caseSensitiveCheckBox.GetValue()
-
 		self.searchWrap = self.searchWrapCheckBox.GetValue()
-
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
 
 		# update the list of searched entries so that it can be exibited in the next find dialog call
@@ -229,6 +238,9 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		log.debug("called onCancel")
 		self.Destroy()
 
+	def onRemoveSearchHistory(self, evt):
+		pass
+
 	def updateProfile(self):
 		log.debug("called updateProfile")
 		setConfig(self.profile, "searchType", self.searchType)
@@ -239,8 +251,9 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 			scheduleProfileSave(self.profile)
 
 	def onStatChange(self, evt):
-		log.debug("called onStatChange")
+		log.debug(f"called onStatChange {self.useSearchHistory}")
 		self._mustSaveProfile = True
+		setDefaultConfig("useSearchHistory", self.useSearchHistory)
 
 	def _truncateSearchHistory(self, entries):
 		del entries[SEARCH_HISTORY_LEAST_RECENT_INDEX:]
