@@ -7,6 +7,8 @@
 from logHandler import log
 import config
 from . import cursorManagerHelper
+from .configUtils import getDefaultConfig, initConfiguration, strToBool
+from .searchHistory import SearchHistory
 
 import globalPluginHandler
 import globalVars
@@ -14,7 +16,6 @@ import globalVars
 import os
 import logging
 
-module = "EnhancedFindDialog"
 
 ADDON_LOG_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "my_addon_shutdown.log")
 log.info("addon log file" + ADDON_LOG_FILE)
@@ -26,16 +27,6 @@ file_handler = logging.FileHandler(ADDON_LOG_FILE, mode='a')  # Use 'w' to overw
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(formatter)
 shutdown_logger.addHandler(file_handler)
-
-
-def initConfiguration():
-	confspec = {
-		"searchCaseSensitivity": "boolean( default=False)",
-		"searchWrap": "boolean( default=False)",
-		"searchType": "string( default='NORMAL')",
-		"useSearchHistory": "boolean( default=False)",
-	}
-	config.conf.spec[module] = confspec
 
 
 def getActiveProfile(self):
@@ -51,6 +42,10 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		self.injectProcessing()
 
 	def terminate(self):
+		if strToBool(getDefaultConfig("useSearchHistory")):
+			searchHistory = SearchHistory.get()
+			searchHistory.persist()
+			shutdown_logger.info('Persisted config')
 		shutdown_logger.info('turned off')
 
 	# the method below is responsible for modifying NVDA behavior.

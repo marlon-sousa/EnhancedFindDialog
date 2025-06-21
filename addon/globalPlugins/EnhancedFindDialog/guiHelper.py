@@ -5,11 +5,11 @@
 # See the file COPYING.txt for more details.
 
 import addonHandler
-import config
 import core
 import gui
 
 from . import cursorManagerHelper
+from .configUtils import getConfig, getDefaultConfig, scheduleProfileSave, setConfig, setDefaultConfig, strToBool  # Noqa: E501
 from .searchHistory import SearchHistory, SearchTerm
 from .searchType import SearchType
 from gui import contextHelp, guiHelper
@@ -46,57 +46,11 @@ SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
 # case sensitivity and search wrapping checkboxes state will be persisted per profile
 # so we need to be able to get and set values from config
 
-module = "EnhancedFindDialog"
 
-
-def strToBool(value):
-	if not isinstance(value, str):
-		return value
-	return value == "True"
-
-
-# we need to mark profiles we updated for save, otherwise they will not be persisted
-def scheduleProfileSave(profile):
-	# default pprofile is always saved
-	if not profile.name:
-		return
-	config.conf._dirtyProfiles.add(profile.name)
-
-
-# get config from default profile
-def getDefaultConfig(key):
-	defaultProfile = config.conf.profiles[0]
-	try:
-		value = defaultProfile[module][key]
-	except KeyError:
-		# Not set in base profile, get default from spec
-		spec = config.conf.spec[module][key]
-		value = config.conf.validator.get_default_value(spec)
-	return value
-
-
-def getConfig(profile, key):
-	# if this is not set on current profile, use the default config values.
-	if module not in profile or key not in profile[module]:
-		return getDefaultConfig(key)
-	return profile[module][key]
-
-
-def setConfig(profile, key, value):
-	if module not in profile:
-		profile[module] = {}
-	profile[module][key] = value
-
-
-def setDefaultConfig(key, value):
-	defaultProfile = config.conf.profiles[0]
-	if module not in defaultProfile:
-		defaultProfile[module] = {}
-	defaultProfile[module][key] = value
-
-
-class EnhancedFindDialog(contextHelp.ContextHelpMixin,
-                         wx.Dialog):  # Noqa: E101
+class EnhancedFindDialog(
+	contextHelp.ContextHelpMixin,
+	wx.Dialog,  # Noqa: E101
+):
 	"""A dialog used to specify text to find in a cursor manager.
 	"""
 
@@ -144,8 +98,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		# present the last searched term  selected by default
 		if searchEntries:
 			self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
-		searchTypeHelper = guiHelper.BoxSizerHelper(
-			self, orientation=wx.HORIZONTAL)
+		searchTypeHelper = guiHelper.BoxSizerHelper(self, orientation=wx.HORIZONTAL)
 		self._searchTypeCtrl = searchTypeHelper.addItem(wx.RadioBox(
 			self,
 			# Translators: A radio box to select the search type.
@@ -160,8 +113,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.searchWrapCheckBox = wx.CheckBox(self, wx.ID_ANY, label=_("Search &wrap"))
 		sHelper.addItem(self.searchWrapCheckBox)
 
-		searchHistoryHelper = guiHelper.BoxSizerHelper(
-			self, orientation=wx.HORIZONTAL)
+		searchHistoryHelper = guiHelper.BoxSizerHelper(self, orientation=wx.HORIZONTAL)
 
 		self.useSearchHistoryCheckBox = wx.CheckBox(
 			self, wx.ID_ANY,
@@ -193,7 +145,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 			self.searchType = SearchType.NORMAL.name
 			self._searchTypeCtrl.Enable(False)
 		self._searchTypeCtrl.SetSelection(SearchType.getIndexByName(self.searchType))
-		if(self.searchType == SearchType.NORMAL.name):
+		if self.searchType == SearchType.NORMAL.name:
 			self.caseSensitiveCheckBox.Enable(True)
 		else:
 			self.caseSensitiveCheckBox.Enable(False)
@@ -257,16 +209,14 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 			except re.error:
 				wx.CallAfter(
 					gui.messageBox,
-					# Translators: Message shown when an invalid regular expression is entered.
+					#  Translators: Message shown when an invalid regular expression is entered.
 					_("The entered text is not a valid regular expression."),
 					cursorManagerHelper.FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
 				)  # Noqa E101
 				return
 
 		self.caseSensitive = self.caseSensitiveCheckBox.GetValue()
-
 		self.searchWrap = self.searchWrapCheckBox.GetValue()
-
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
 
 		# update the list of searched entries so that it can be exibited in the next find dialog call
@@ -287,6 +237,9 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 	def onCancel(self, evt):
 		log.debug("called onCancel")
 		self.Destroy()
+
+	def onRemoveSearchHistory(self, evt):
+		pass
 
 	def updateProfile(self):
 		log.debug("called updateProfile")
