@@ -5,11 +5,11 @@
 # See the file COPYING.txt for more details.
 
 import addonHandler
-import config
 import core
 import gui
 
 from . import cursorManagerHelper
+from .configUtils import getConfig, getDefaultConfig, scheduleProfileSave, setConfig, setDefaultConfig, strToBool  # Noqa: E501
 from .searchHistory import SearchHistory, SearchTerm
 from .searchType import SearchType
 from gui import contextHelp, guiHelper
@@ -46,43 +46,11 @@ SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
 # case sensitivity and search wrapping checkboxes state will be persisted per profile
 # so we need to be able to get and set values from config
 
-module = "EnhancedFindDialog"
 
-
-def strToBool(value):
-	if not isinstance(value, str):
-		return value
-	return value == "True"
-
-
-# we need to mark profiles we updated for save, otherwise they will not be persisted
-def scheduleProfileSave(profile):
-	# default pprofile is always saved
-	if not profile.name:
-		return
-	config.conf._dirtyProfiles.add(profile.name)
-
-
-# get config from default profile
-def getDefaultConfig(key):
-	return config.conf[module][key]
-
-
-def getConfig(profile, key):
-	# if this is not set on current profile, use the default config values.
-	if module not in profile or key not in profile[module]:
-		return getDefaultConfig(key)
-	return profile[module][key]
-
-
-def setConfig(profile, key, value):
-	if module not in profile:
-		profile[module] = {}
-	profile[module][key] = value
-
-
-class EnhancedFindDialog(contextHelp.ContextHelpMixin,
-                         wx.Dialog):  # Noqa: E101
+class EnhancedFindDialog(
+	contextHelp.ContextHelpMixin,
+	wx.Dialog,  # Noqa: E101
+):
 	"""A dialog used to specify text to find in a cursor manager.
 	"""
 
@@ -103,6 +71,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.profile = profile
 		self.caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
 		self.searchWrap = strToBool(getConfig(profile, "searchWrap"))
+		self.useSearchHistory = strToBool(getDefaultConfig("useSearchHistory"))
 		self.searchType = SearchType.getByName(getConfig(profile, "searchType")).name
 		self.buildGui()
 		self.updateUi()
@@ -111,9 +80,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 	def buildGui(self):
 		log.debug("called buildGui")
 		supportsRegexp = self.activeCursorManager.supportsRegexpSearch()
-		searchEntries = self.searchHistory.getItems(None if supportsRegexp else SearchType.NORMAL.name)
-		# if the search type is not supported, remove it from the list of search entries
-		searchTerms = [entry.text for entry in searchEntries]
+		self.searchEntries = self.searchHistory.getItems(None if supportsRegexp else SearchType.NORMAL.name)
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 
 		sHelper = guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
@@ -122,15 +89,12 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		textToFind = wx.StaticText(self, wx.ID_ANY, label=__("Type the text you wish to find"))
 		hSizer.Add(textToFind, flag=wx.ALIGN_CENTER_VERTICAL)
 		hSizer.AddSpacer(guiHelper.SPACE_BETWEEN_ASSOCIATED_CONTROL_HORIZONTAL)
-		self.findTextField = wx.ComboBox(self, wx.ID_ANY, choices=searchTerms, style=wx.CB_DROPDOWN)
+		self.findTextField = wx.ComboBox(self, wx.ID_ANY, style=wx.CB_DROPDOWN)
+		if self.searchEntries:
+			self.updateFindTextEntries()
 		hSizer.Add(self.findTextField)
 		sHelper.addItem(hSizer)
-		# if there is a previous list of searched entries, make sure we
-		# present the last searched term  selected by default
-		if searchEntries:
-			self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
-		searchTypeHelper = guiHelper.BoxSizerHelper(
-			self, orientation=wx.HORIZONTAL)
+		searchTypeHelper = guiHelper.BoxSizerHelper(self, orientation=wx.HORIZONTAL)
 		self._searchTypeCtrl = searchTypeHelper.addItem(wx.RadioBox(
 			self,
 			# Translators: A radio box to select the search type.
@@ -145,6 +109,20 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.searchWrapCheckBox = wx.CheckBox(self, wx.ID_ANY, label=_("Search &wrap"))
 		sHelper.addItem(self.searchWrapCheckBox)
 
+		searchHistoryHelper = guiHelper.BoxSizerHelper(self, orientation=wx.HORIZONTAL)
+
+		self.useSearchHistoryCheckBox = wx.CheckBox(
+			self, wx.ID_ANY,
+			# Translators: An option in find dialog to save search history persistently
+			label=_("Use search history"))
+		self.removeSearchHistoryButton = wx.Button(
+			self, wx.ID_ANY,
+			# Translators: A button to remove search history.
+			label=_("Remove search history"))
+		searchHistoryHelper.addItem(self.useSearchHistoryCheckBox)
+		searchHistoryHelper.addItem(self.removeSearchHistoryButton)
+		sHelper.addItem(searchHistoryHelper)
+
 		sHelper.addDialogDismissButtons(self.CreateButtonSizer(wx.OK | wx.CANCEL))
 
 		mainSizer.Add(sHelper.sizer, border=guiHelper.BORDER_FOR_DIALOGS, flag=wx.ALL)
@@ -158,14 +136,23 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		log.debug("called update ui")
 		self.caseSensitiveCheckBox.SetValue(self.caseSensitivity)
 		self.searchWrapCheckBox.SetValue(self.searchWrap)
+		self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
 		if not self.activeCursorManager.supportsRegexpSearch():
 			self.searchType = SearchType.NORMAL.name
 			self._searchTypeCtrl.Enable(False)
 		self._searchTypeCtrl.SetSelection(SearchType.getIndexByName(self.searchType))
-		if(self.searchType == SearchType.NORMAL.name):
+		if self.searchType == SearchType.NORMAL.name:
 			self.caseSensitiveCheckBox.Enable(True)
 		else:
 			self.caseSensitiveCheckBox.Enable(False)
+
+	def updateFindTextEntries(self):
+		log.debug("called updateFindTextEntries")
+		searchTerms = [entry.text for entry in self.searchEntries]
+		mostRecentSearchTerm = self.searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX]
+		self.searchType = mostRecentSearchTerm.searchType
+		self.findTextField.SetItems(searchTerms)
+		self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
 
 	def bindEvents(self):
 		log.debug("called bind events")
@@ -174,12 +161,58 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		self.caseSensitiveCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self._searchTypeCtrl.Bind(wx.EVT_RADIOBOX, self.OnSearchTypeChanged)
-		self._searchTypeCtrl.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+		self.findTextField.Bind(wx.EVT_COMBOBOX, self.onSearchTermChanged)
+		self.useSearchHistoryCheckBox.Bind(wx.EVT_CHECKBOX, self.onUseSearchHistory)
+		self.removeSearchHistoryButton.Bind(wx.EVT_BUTTON, self.onRemoveSearchHistory)
 
 	def OnSearchTypeChanged(self, evt):
 		log.debug("called OnSearchTypeChanged")
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
 		self.updateUi()
+		self.onStatChange(evt)
+
+	def onSearchTermChanged(self, evt):
+		log.debug("called onSearchTermChanged")
+		selectedSearchTermindex = self.findTextField.GetSelection()
+		mostRecentSearchTerm = self.searchEntries[selectedSearchTermindex]
+		self.searchType = mostRecentSearchTerm.searchType
+		self.updateUi()
+		self.onStatChange(evt)
+
+	def onUseSearchHistory(self, evt):
+		log.debug("called onUseSearchHistory")
+		if self.useSearchHistoryCheckBox.GetValue():
+			log.debug("Use search history checked")
+			dlg = wx.MessageDialog(
+				None,
+				# Translators: Message shown when enabling persistent search history.
+				_("Do you want to use your search history?"),
+				# Translators: Title for the save search history confirmation dialog.
+				_("Confirm Use Search History"),
+				wx.OK | wx.CANCEL | wx.ICON_QUESTION
+			)
+			dlg.SetOKCancelLabels(
+				# Translators: Label for the confirm usage button
+				_("Confirm usage"),
+				# Translators: Label for the deny usage button
+				_("Deny usage"))
+			result = dlg.ShowModal()
+			dlg.Destroy()
+			self.useSearchHistory = (result == wx.ID_OK)
+			if self.useSearchHistory:
+				log.debug("Use search history confirmed")
+				# merge with history from disk
+				self.searchHistory.mergeWithHistoryFromDisk()
+				# truncate the search history to the last 20 entries
+				self._truncateSearchHistory(self.searchHistory._terms)
+				supportsRegexp = self.activeCursorManager.supportsRegexpSearch()
+				self.searchEntries = self.searchHistory.getItems(None if supportsRegexp else SearchType.NORMAL.name)
+				if(self.searchEntries):
+					self.updateFindTextEntries()
+		else:
+			self.useSearchHistory = False
+		self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
+		self.useSearchHistoryCheckBox.SetFocus()
 		self.onStatChange(evt)
 
 	def updateSearchHistory(self, currentSearchText):
@@ -198,16 +231,14 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 			except re.error:
 				wx.CallAfter(
 					gui.messageBox,
-					# Translators: Message shown when an invalid regular expression is entered.
+					#  Translators: Message shown when an invalid regular expression is entered.
 					_("The entered text is not a valid regular expression."),
 					cursorManagerHelper.FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
 				)  # Noqa E101
 				return
 
 		self.caseSensitive = self.caseSensitiveCheckBox.GetValue()
-
 		self.searchWrap = self.searchWrapCheckBox.GetValue()
-
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
 
 		# update the list of searched entries so that it can be exibited in the next find dialog call
@@ -229,6 +260,19 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		log.debug("called onCancel")
 		self.Destroy()
 
+	def onRemoveSearchHistory(self, evt):
+		if self._confirmSearchHistoryDeletion():
+			log.debug("called onRemoveSearchHistory")
+			self.searchHistory.removePersistentHistory()
+			self.searchHistory.clean()
+			self.searchEntries = []
+			self.findTextField.SetItems([])
+			self.findTextField.SetValue("")
+			self.findTextField.SetFocus()
+			self.useSearchHistory = False
+			self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
+			self.onStatChange(evt)
+
 	def updateProfile(self):
 		log.debug("called updateProfile")
 		setConfig(self.profile, "searchType", self.searchType)
@@ -239,8 +283,28 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 			scheduleProfileSave(self.profile)
 
 	def onStatChange(self, evt):
-		log.debug("called onStatChange")
+		log.debug(f"called onStatChange {self.useSearchHistory}")
 		self._mustSaveProfile = True
+		setDefaultConfig("useSearchHistory", self.useSearchHistory)
+
+	def _confirmSearchHistoryDeletion(self):
+		log.debug("called confirmSearchHistoryDeletion")
+		dlg = wx.MessageDialog(
+			None,
+			# Translators: Message shown when removing search history.
+			_("Do you want to remove your search history?"),
+			# Translators: Title for the remove search history confirmation dialog.
+			_("Confirm Remove Search History"),
+			wx.OK | wx.CANCEL | wx.ICON_QUESTION
+		)
+		dlg.SetOKCancelLabels(
+			# Translators: Label for the confirm removal button
+			_("Confirm removal"),
+			# Translators: Label for the deny removal button
+			_("Deny removal"))
+		result = dlg.ShowModal()
+		dlg.Destroy()
+		return result == wx.ID_OK
 
 	def _truncateSearchHistory(self, entries):
 		del entries[SEARCH_HISTORY_LEAST_RECENT_INDEX:]
