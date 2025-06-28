@@ -80,9 +80,7 @@ class EnhancedFindDialog(
 	def buildGui(self):
 		log.debug("called buildGui")
 		supportsRegexp = self.activeCursorManager.supportsRegexpSearch()
-		searchEntries = self.searchHistory.getItems(None if supportsRegexp else SearchType.NORMAL.name)
-		# if the search type is not supported, remove it from the list of search entries
-		searchTerms = [entry.text for entry in searchEntries]
+		self.searchEntries = self.searchHistory.getItems(None if supportsRegexp else SearchType.NORMAL.name)
 		mainSizer = wx.BoxSizer(wx.VERTICAL)
 
 		sHelper = guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
@@ -91,13 +89,11 @@ class EnhancedFindDialog(
 		textToFind = wx.StaticText(self, wx.ID_ANY, label=__("Type the text you wish to find"))
 		hSizer.Add(textToFind, flag=wx.ALIGN_CENTER_VERTICAL)
 		hSizer.AddSpacer(guiHelper.SPACE_BETWEEN_ASSOCIATED_CONTROL_HORIZONTAL)
-		self.findTextField = wx.ComboBox(self, wx.ID_ANY, choices=searchTerms, style=wx.CB_DROPDOWN)
+		self.findTextField = wx.ComboBox(self, wx.ID_ANY, style=wx.CB_DROPDOWN)
+		if self.searchEntries:
+			self.updateFindTextEntries()
 		hSizer.Add(self.findTextField)
 		sHelper.addItem(hSizer)
-		# if there is a previous list of searched entries, make sure we
-		# present the last searched term  selected by default
-		if searchEntries:
-			self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
 		searchTypeHelper = guiHelper.BoxSizerHelper(self, orientation=wx.HORIZONTAL)
 		self._searchTypeCtrl = searchTypeHelper.addItem(wx.RadioBox(
 			self,
@@ -150,6 +146,14 @@ class EnhancedFindDialog(
 		else:
 			self.caseSensitiveCheckBox.Enable(False)
 
+	def updateFindTextEntries(self):
+		log.debug("called updateFindTextEntries")
+		searchTerms = [entry.text for entry in self.searchEntries]
+		mostRecentSearchTerm = self.searchEntries[SEARCH_HISTORY_MOST_RECENT_INDEX]
+		self.searchType = mostRecentSearchTerm.searchType
+		self.findTextField.SetItems(searchTerms)
+		self.findTextField.Select(SEARCH_HISTORY_MOST_RECENT_INDEX)
+
 	def bindEvents(self):
 		log.debug("called bind events")
 		self.Bind(wx.EVT_BUTTON, self.onOk, id=wx.ID_OK)
@@ -157,13 +161,21 @@ class EnhancedFindDialog(
 		self.caseSensitiveCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self._searchTypeCtrl.Bind(wx.EVT_RADIOBOX, self.OnSearchTypeChanged)
-		self._searchTypeCtrl.Bind(wx.EVT_CHECKBOX, self.onStatChange)
+		self.findTextField.Bind(wx.EVT_COMBOBOX, self.onSearchTermChanged)
 		self.useSearchHistoryCheckBox.Bind(wx.EVT_CHECKBOX, self.onUseSearchHistory)
 		self.removeSearchHistoryButton.Bind(wx.EVT_BUTTON, self.onRemoveSearchHistory)
 
 	def OnSearchTypeChanged(self, evt):
 		log.debug("called OnSearchTypeChanged")
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
+		self.updateUi()
+		self.onStatChange(evt)
+
+	def onSearchTermChanged(self, evt):
+		log.debug("called onSearchTermChanged")
+		selectedSearchTermindex = self.findTextField.GetSelection()
+		mostRecentSearchTerm = self.searchEntries[selectedSearchTermindex]
+		self.searchType = mostRecentSearchTerm.searchType
 		self.updateUi()
 		self.onStatChange(evt)
 
@@ -187,6 +199,16 @@ class EnhancedFindDialog(
 			result = dlg.ShowModal()
 			dlg.Destroy()
 			self.useSearchHistory = (result == wx.ID_OK)
+			if self.useSearchHistory:
+				log.debug("Use search history confirmed")
+				# merge with history from disk
+				self.searchHistory.mergeWithHistoryFromDisk()
+				# truncate the search history to the last 20 entries
+				self._truncateSearchHistory(self.searchHistory._terms)
+				supportsRegexp = self.activeCursorManager.supportsRegexpSearch()
+				self.searchEntries = self.searchHistory.getItems(None if supportsRegexp else SearchType.NORMAL.name)
+				if(self.searchEntries):
+					self.updateFindTextEntries()
 		else:
 			self.useSearchHistory = False
 		self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
@@ -239,7 +261,17 @@ class EnhancedFindDialog(
 		self.Destroy()
 
 	def onRemoveSearchHistory(self, evt):
-		pass
+		if self._confirmSearchHistoryDeletion():
+			log.debug("called onRemoveSearchHistory")
+			self.searchHistory.removePersistentHistory()
+			self.searchHistory.clean()
+			self.searchEntries = []
+			self.findTextField.SetItems([])
+			self.findTextField.SetValue("")
+			self.findTextField.SetFocus()
+			self.useSearchHistory = False
+			self.useSearchHistoryCheckBox.SetValue(self.useSearchHistory)
+			self.onStatChange(evt)
 
 	def updateProfile(self):
 		log.debug("called updateProfile")
@@ -254,6 +286,25 @@ class EnhancedFindDialog(
 		log.debug(f"called onStatChange {self.useSearchHistory}")
 		self._mustSaveProfile = True
 		setDefaultConfig("useSearchHistory", self.useSearchHistory)
+
+	def _confirmSearchHistoryDeletion(self):
+		log.debug("called confirmSearchHistoryDeletion")
+		dlg = wx.MessageDialog(
+			None,
+			# Translators: Message shown when removing search history.
+			_("Do you want to remove your search history?"),
+			# Translators: Title for the remove search history confirmation dialog.
+			_("Confirm Remove Search History"),
+			wx.OK | wx.CANCEL | wx.ICON_QUESTION
+		)
+		dlg.SetOKCancelLabels(
+			# Translators: Label for the confirm removal button
+			_("Confirm removal"),
+			# Translators: Label for the deny removal button
+			_("Deny removal"))
+		result = dlg.ShowModal()
+		dlg.Destroy()
+		return result == wx.ID_OK
 
 	def _truncateSearchHistory(self, entries):
 		del entries[SEARCH_HISTORY_LEAST_RECENT_INDEX:]

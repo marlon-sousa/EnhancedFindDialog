@@ -24,25 +24,22 @@ class SearchHistory:
 
 	def __init__(self):
 		if strToBool(getDefaultConfig("useSearchHistory")):
-			self._loadFromDisk()
+			self._terms = self.loadFromDisk()
 			return
 		self._terms = []
 
-	def _loadFromDisk(self):
-		# Load the pickle file from the addon directory
-		addonPath = addonHandler.getCodeAddon().path
-		filePath = os.path.join(addonPath, "search_history.pkl")
+	def loadFromDisk(self):
+		filePath = self._getSearchHistoryPath()
 		if os.path.exists(filePath):
 			with open(filePath, "rb") as f:
 				data = pickle.load(f)
 				if data.get("version") == "1.0":
-					self._terms = data.get("terms", [])
+					return data.get("terms", [])
 				else:
 					log.error(f"Unsupported search history version: {data.get('version')}")
-					self._terms = []
 		else:
 			log.info("No search history file found, starting with an empty history.")
-			self._terms = []
+		return []
 
 	def persist(self):
 		data = {
@@ -51,10 +48,35 @@ class SearchHistory:
 			"terms": self._terms,
 		}
 		# Save the pickle file in the addon directory
-		addonPath = addonHandler.getCodeAddon().path
-		filePath = os.path.join(addonPath, "search_history.pkl")
+		filePath = self._getSearchHistoryPath()
 		with open(filePath, "wb") as f:
 			pickle.dump(data, f)
+
+	def mergeWithHistoryFromDisk(self):
+		filePath = self._getSearchHistoryPath()
+		if not os.path.exists(filePath):
+			return
+		sessionTerms = self._terms
+		self._terms = self.loadFromDisk()
+		for term in sessionTerms:
+			self.append(term)
+
+	def clean(self):
+		"""Remove all search terms from the history."""
+		self._terms = []
+		log.info("Search history cleared.")
+
+	def removePersistentHistory(self):
+		filePath = self._getSearchHistoryPath()
+		if os.path.exists(filePath):
+			os.remove(filePath)
+			log.info("Search history file removed.")
+		else:
+			log.info("No search history file to remove.")
+
+	def _getSearchHistoryPath(self):
+		addonPath = addonHandler.getCodeAddon().path
+		return os.path.join(addonPath, "search_history.pkl")
 
 	def getMostRecent(self):
 		return self._terms[0] if self._terms else None
