@@ -222,10 +222,17 @@ def find(cursorManager, searchTerm, info, reverse, caseSensitive):
 def findRegexp(self, text, reverse=False):
 	if reverse:
 		inText = self._getTextRange(0, self._startOffset)
-		matches = list(re.finditer(text, inText, re.UNICODE))
-		if not matches:
-			return False
-		m = matches[-1]
+		curOffset = 0
+		endOffset = self._startOffset
+		m = None
+		while curOffset < self._startOffset:
+			tempMatch = re.search(text, inText[curOffset:endOffset + 1], re.UNICODE)
+			if not tempMatch:
+				break
+
+			m = tempMatch
+			matchLocation = curOffset + m.start()
+			curOffset += m.start() + 1
 	else:
 		inText = self._getTextRange(self._startOffset + 1, self._getStoryLength())
 		m = re.search(text, inText, re.UNICODE)
@@ -235,7 +242,7 @@ def findRegexp(self, text, reverse=False):
 	converter = textUtils.getOffsetConverter(self.encoding)(inText)
 
 	if reverse:
-		offset = converter.strToEncodedOffsets(m.start())
+		offset = converter.strToEncodedOffsets(matchLocation)
 	else:
 		offset = self._startOffset + 1 + converter.strToEncodedOffsets(m.start())
 
