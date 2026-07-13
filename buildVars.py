@@ -1,50 +1,43 @@
-# -*- coding: UTF-8 -*-
-
 # Build customizations
 # Change this file instead of sconstruct or manifest files, whenever possible.
 
-# Full getext (please don't change)
-_ = lambda x : x
+from site_scons.site_tools.NVDATool.typings import AddonInfo, BrailleTables, SymbolDictionaries
+from site_scons.site_tools.NVDATool.utils import _
 
-# Add-on information variables
-addon_info = {
-	# for previously unpublished addons, please follow the community guidelines at:
-	# https://bitbucket.org/nvdaaddonteam/todo/raw/master/guidelines.txt
-	# add-on Name, internal for nvda
-	"addon_name" : "EnhancedFindDialog",
-	# Add-on summary, usually the user visible name of the addon.
-	# Translators: Summary for this add-on to be shown on installation and add-on information.
-	"addon_summary" : _("Enhanced find dialog for NVDA"),
-	# Add-on description
-	# Translators: Long description to be shown for this add-on on add-on information from add-ons manager
-	"addon_description" : _("""This addon introduces improvements to the NVDA find dialog.
+
+addon_info = AddonInfo(
+    addon_name="EnhancedFindDialog",
+    # Translators: Summary/title for this add-on.
+    addon_summary=_("Enhanced find dialog for NVDA"),
+    # Translators: Long description for this add-on in add-on store.
+    addon_description=_("""This addon introduces improvements to the NVDA find dialog.
 It is now possible to have your previous searches history available on a list during the NVDA session, which will enable you to quickly select and search for previous searched terms."""),
-	# version
-	"addon_version" : "1.7.0",
-	# Author(s)
-	"addon_author" : u"Marlon Brandão de Sousa <marlon.bsousa@gmail.com>, Thiago Seus <thiago.seus@yahoo.com.br>",
-	# URL for the add-on documentation support
-	"addon_url" : "https://github.com/marlon-sousa/EnhancedFindDialog",
-	# Documentation file name
-	"addon_docFileName" : "readme.html",
-	# Minimum NVDA version supported (e.g. "2018.3.0", minor version is optional)
-	"addon_minimumNVDAVersion" : "2022.1",
-	# Last NVDA version supported/tested (e.g. "2018.4.0", ideally more recent than minimum version)
-	"addon_lastTestedNVDAVersion" : "2025.1",
-	# Add-on update channel (default is None, denoting stable releases, and for development releases, use "dev"; do not change unless you know what you are doing)
-	"addon_updateChannel" : None,
-}
+    # Translators: what's new text for this add-on version shown in add-on store.
+    addon_changelog=_("""NVDA 2026.1 compatibility. Minimum supported NVDA version is now 2026.1."""),
+    addon_version="1.9.0",
+    addon_author="Marlon Brandão de Sousa <marlon.bsousa@gmail.com>, Thiago Seus <thiago.seus@yahoo.com.br>",
+    addon_url="https://github.com/marlon-sousa/EnhancedFindDialog",
+    addon_sourceURL="https://github.com/marlon-sousa/EnhancedFindDialog",
+    addon_docFileName="readme.html",
+    addon_minimumNVDAVersion="2026.1",
+    addon_lastTestedNVDAVersion="2026.1.0",
+    addon_updateChannel=None,
+    addon_license="MIT License",
+    addon_licenseURL="https://github.com/marlon-sousa/EnhancedFindDialog/blob/master/LICENSE",
+)
 
 
-import os.path
+pythonSources: list[str] = ["addon/globalPlugins/EnhancedFindDialog/*.py"]
+i18nSources: list[str] = pythonSources + ["buildVars.py"]
 
-# Define the python files that are the sources of your add-on.
-# You can use glob expressions here, they will be expanded.
-pythonSources = [os.path.join("addon", "globalPlugins", "EnhancedFindDialog", "*.py")]
+# Paths are relative to the addon directory when building the bundle.
+excludedFiles: list[str] = [
+    "doc/*/contributing*.*",
+    "doc/*/*.tpl.md",
+]
 
-# Files that contain strings for translation. Usually your python sources
-i18nSources = pythonSources + ["buildVars.py"]
+baseLanguage: str = "en"
+markdownExtensions: list[str] = []
 
-# Files that will be ignored when building the nvda-addon file
-# Paths are relative to the addon directory, not to the root directory of your addon sources.
-excludedFiles = [os.path.join("addon", "doc", "*", "contributing*.*")]
+brailleTables: BrailleTables = {}
+symbolDictionaries: SymbolDictionaries = {}

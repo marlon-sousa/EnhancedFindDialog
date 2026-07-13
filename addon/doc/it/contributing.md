@@ -21,11 +21,11 @@ Esegui un comando git submodule update --init per assicurarti che i sottomoduli 
 
 Si avrà necessità di:
 
-* python 3.11.
+* python 3.13.
 * pip deve essere configurato
 * scons (pip install scons)
 * markdown (pip install markdown)
-* L'utilità msgfmt. Il modo più semplice per ottenerlo è installare git bash e scegliere di includere gli strumenti bash al prompt dei comandi
+* gettext, che fornisce le utilità `msgfmt` e `xgettext`. `msgfmt` compila i file di traduzione a ogni compilazione, e `xgettext` è usato da `scons pot` per generare il modello di traduzione. Su Windows, installa una versione moderna da [gettext-iconv-windows](https://github.com/mlocati/gettext-iconv-windows/releases) (oppure usa `scoop install gettext` / `choco install gettext`), e assicurati che la sua cartella `bin` venga prima di qualsiasi altro gettext nel tuo PATH. Non usare il pacchetto gettext di GnuWin32: è congelato alla versione 0.14.4 (2005) ed è troppo vecchio per questa compilazione (`scons pot` fallisce a causa dell'opzione non supportata `--package-name`).
 
 #### Pre-commit
 

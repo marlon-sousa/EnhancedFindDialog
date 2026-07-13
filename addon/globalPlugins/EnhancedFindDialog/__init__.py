@@ -23,12 +23,6 @@ def initConfiguration():
 	config.conf.spec[module] = confspec
 
 
-def getActiveProfile(self):
-	if globalVars.appArgs.secure:
-		return
-	return self.profiles[-1]
-
-
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 
 	def __init__(self, *args, **kwargs):
@@ -43,10 +37,6 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 		# Don't inject on secure screens as the addon can write to configuration
 		if globalVars.appArgs.secure:
 			return
-
-		# add utility method to ConfigManager class to allow us to get the active profile in a higher level
-		if not hasattr(config.ConfigManager, "getActiveProfile"):
-			config.ConfigManager.getActiveProfile = getActiveProfile
 
 		initConfiguration()
 

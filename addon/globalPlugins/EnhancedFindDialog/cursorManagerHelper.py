@@ -6,11 +6,10 @@
 
 
 import addonHandler
-import buildVersion
-import config
 import controlTypes
 from cursorManager import CursorManager
 import gui
+from gui.message import MessageDialog
 import textInfos.offsets
 import textUtils
 from . import guiHelper
@@ -49,13 +48,9 @@ SEARCH_HISTORY_MOST_RECENT_INDEX = 0
 SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
 
 
-# Workaround to support the new find error dialog title introduced in NVDA 2024.1
-if buildVersion.version_year > 2023:
-	# Translators: message dialog title displayed to the user when
-	# searching text and no text is found.
-	FIND_ERROR_DIALOG_TITLE = __("0 matches")
-else:
-	FIND_ERROR_DIALOG_TITLE = __("Find Error")
+# Translators: message dialog title displayed to the user when
+# searching text and no text is found.
+FIND_ERROR_DIALOG_TITLE = __("0 matches")
 
 
 def patchCursorManager():
@@ -81,13 +76,8 @@ def patchOffsetsTextInfo():
 def script_enhancedFind(self, gesture, reverse=False):
 	# #8566: We need this to be a modal dialog, but it mustn't block this script.
 	def run():
-		# get the active profile and send that to the find dialog
-		# this is needed because whenever the find dialog is opened the default profile is loaded.
-		# We, however, want to retrieve state from the active profile when the find dialog was loaded
-		profile = config.conf.getActiveProfile()
-
 		gui.mainFrame.prePopup()
-		d = guiHelper.EnhancedFindDialog(gui.mainFrame, self, profile, reverse)
+		d = guiHelper.EnhancedFindDialog(gui.mainFrame, self, reverse)
 		d.ShowModal()
 		gui.mainFrame.postPopup()
 	wx.CallAfter(run)
@@ -164,8 +154,8 @@ def doFindText(cursorManagerInstance, searchTerm,
 		if not willSayAllResume:
 			speech.speakTextInfo(info, reason=controlTypes.OutputReason.CARET)
 	else:
-		wx.CallAfter(gui.messageBox, __('text "%s" not found') % searchTerm.text,
-		             FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR)  # Noqa E101
+		wx.CallAfter(MessageDialog.alert, __('text "%s" not found') % searchTerm.text,
+		             FIND_ERROR_DIALOG_TITLE)  # Noqa E101
 	CursorManager._lastFindText = searchTerm.text
 	CursorManager._lastCaseSensitivity = caseSensitive
 	CursorManager._searchWrap = searchWrap
@@ -208,9 +198,10 @@ def find(cursorManager, searchTerm, info, reverse, caseSensitive):
 	if searchTerm.searchType == SearchType.REGULAR_EXPRESSION.name:
 		if not cursorManager.supportsRegexpSearch():
 			wx.CallAfter(
-				# Translators: Message shown when an invalid regular expression is entered.
+				MessageDialog.alert,
+				# Translators: Message shown when the current control does not support regular expression searches.
 				_("current textInfo backend does not support regular expression searches"),
-				FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
+				FIND_ERROR_DIALOG_TITLE
 			)
 			return None
 		res = info.findRegexp(searchTerm.text, reverse=reverse)

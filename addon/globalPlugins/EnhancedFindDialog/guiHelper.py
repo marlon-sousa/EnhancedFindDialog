@@ -7,12 +7,12 @@
 import addonHandler
 import config
 import core
-import gui
 
 from . import cursorManagerHelper
 from .searchHistory import SearchHistory, SearchTerm
 from .searchType import SearchType
 from gui import contextHelp, guiHelper
+from gui.message import MessageDialog
 import wx
 
 from logHandler import log
@@ -43,67 +43,37 @@ SEARCH_HISTORY_MOST_RECENT_INDEX = 0
 SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
 
 
-# case sensitivity and search wrapping checkboxes state will be persisted per profile
-# so we need to be able to get and set values from config
+# case sensitivity, search wrapping and search type are persisted per profile.
+# The dialog sets shouldSuspendConfigProfileTriggers (see the class below), so while it is
+# shown the configuration profile that was active in the document stays active. That lets us
+# read and write config.conf directly: values target the correct profile, and NVDA marks
+# that profile dirty and persists it as usual.
 
 module = "EnhancedFindDialog"
 
 
-def strToBool(value):
-	if not isinstance(value, str):
-		return value
-	return value == "True"
-
-
-# we need to mark profiles we updated for save, otherwise they will not be persisted
-def scheduleProfileSave(profile):
-	# default pprofile is always saved
-	if not profile.name:
-		return
-	config.conf._dirtyProfiles.add(profile.name)
-
-
-# get config from default profile
-def getDefaultConfig(key):
-	return config.conf[module][key]
-
-
-def getConfig(profile, key):
-	# if this is not set on current profile, use the default config values.
-	if module not in profile or key not in profile[module]:
-		return getDefaultConfig(key)
-	return profile[module][key]
-
-
-def setConfig(profile, key, value):
-	if module not in profile:
-		profile[module] = {}
-	profile[module][key] = value
-
-
-class EnhancedFindDialog(contextHelp.ContextHelpMixin,
-                         wx.Dialog):  # Noqa: E101
+class EnhancedFindDialog(contextHelp.ContextHelpMixin, wx.Dialog):
 	"""A dialog used to specify text to find in a cursor manager.
 	"""
 
 	helpId = "SearchingForText"
 
-	def __init__(self, parent, cursorManager, profile, reverseSearch):
+	# Keep the configuration profile that was active in the document active while this
+	# dialog is shown, so per-profile settings are read from and saved to that profile.
+	# Requires NVDA 2026.1, which suspends profile triggers for any shown top-level window
+	# that sets this attribute.
+	shouldSuspendConfigProfileTriggers = True
+
+	def __init__(self, parent, cursorManager, reverseSearch):
 		# Translators: Title of a dialog to find text.
 		super().__init__(parent, title=__("Find"))
 		self.searchHistory = SearchHistory.get()
 		self.reverseSearch = reverseSearch
-		# if checkboxes change during this dialog we need to save the profile with the new values
-		self._mustSaveProfile = False
 		# Have a copy of the active cursor manager, as this is needed later for finding text.
 		self.activeCursorManager = cursorManager
-		# have a copy of the profile active when this dialog was called
-		# this is needed because whenever the find dialog is opened the default profile is loaded. We, however, want
-		# to retrieve state from the active profile when the find dialog was loaded
-		self.profile = profile
-		self.caseSensitivity = strToBool(getConfig(profile, "searchCaseSensitivity"))
-		self.searchWrap = strToBool(getConfig(profile, "searchWrap"))
-		self.searchType = SearchType.getByName(getConfig(profile, "searchType")).name
+		self.caseSensitivity = config.conf[module]["searchCaseSensitivity"]
+		self.searchWrap = config.conf[module]["searchWrap"]
+		self.searchType = SearchType.getByName(config.conf[module]["searchType"]).name
 		self.buildGui()
 		self.updateUi()
 		self.bindEvents()
@@ -162,7 +132,7 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 			self.searchType = SearchType.NORMAL.name
 			self._searchTypeCtrl.Enable(False)
 		self._searchTypeCtrl.SetSelection(SearchType.getIndexByName(self.searchType))
-		if(self.searchType == SearchType.NORMAL.name):
+		if (self.searchType == SearchType.NORMAL.name):
 			self.caseSensitiveCheckBox.Enable(True)
 		else:
 			self.caseSensitiveCheckBox.Enable(False)
@@ -171,16 +141,12 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 		log.debug("called bind events")
 		self.Bind(wx.EVT_BUTTON, self.onOk, id=wx.ID_OK)
 		self.Bind(wx.EVT_BUTTON, self.onCancel, id=wx.ID_CANCEL)
-		self.caseSensitiveCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
-		self.searchWrapCheckBox.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 		self._searchTypeCtrl.Bind(wx.EVT_RADIOBOX, self.OnSearchTypeChanged)
-		self._searchTypeCtrl.Bind(wx.EVT_CHECKBOX, self.onStatChange)
 
 	def OnSearchTypeChanged(self, evt):
 		log.debug("called OnSearchTypeChanged")
 		self.searchType = SearchType.getByIndex(self._searchTypeCtrl.GetSelection()).name
 		self.updateUi()
-		self.onStatChange(evt)
 
 	def updateSearchHistory(self, currentSearchText):
 		if not currentSearchText:
@@ -197,10 +163,10 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 				re.compile(text)
 			except re.error:
 				wx.CallAfter(
-					gui.messageBox,
+					MessageDialog.alert,
 					# Translators: Message shown when an invalid regular expression is entered.
 					_("The entered text is not a valid regular expression."),
-					cursorManagerHelper.FIND_ERROR_DIALOG_TITLE, wx.OK | wx.ICON_ERROR
+					cursorManagerHelper.FIND_ERROR_DIALOG_TITLE
 				)  # Noqa E101
 				return
 
@@ -231,16 +197,9 @@ class EnhancedFindDialog(contextHelp.ContextHelpMixin,
 
 	def updateProfile(self):
 		log.debug("called updateProfile")
-		setConfig(self.profile, "searchType", self.searchType)
-		setConfig(self.profile, "searchCaseSensitivity", self.caseSensitiveCheckBox.GetValue())
-		setConfig(self.profile, "searchWrap", self.searchWrapCheckBox.GetValue())
-
-		if self._mustSaveProfile:
-			scheduleProfileSave(self.profile)
-
-	def onStatChange(self, evt):
-		log.debug("called onStatChange")
-		self._mustSaveProfile = True
+		config.conf[module]["searchType"] = self.searchType
+		config.conf[module]["searchCaseSensitivity"] = self.caseSensitiveCheckBox.GetValue()
+		config.conf[module]["searchWrap"] = self.searchWrapCheckBox.GetValue()
 
 	def _truncateSearchHistory(self, entries):
 		del entries[SEARCH_HISTORY_LEAST_RECENT_INDEX:]
