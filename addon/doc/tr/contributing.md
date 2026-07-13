@@ -4,11 +4,11 @@
 
 İhtiyacınız olacak:
 
-* Python 3.6 veya üzeri.
+* Python 3.13 veya üzeri.
 * pip yapılandırılmalıdır
 * scons (pip kurulumu scons)
 * markdown (pip kurulumu markdown)
-* msgfmt yardımcı programı. Bunu elde etmenin en kolay yolu, git bash'i kurmak ve komut istemine bash araçlarını dahil etmeyi seçmektir.
+* gettext; `msgfmt` ve `xgettext` araçlarını sağlar. `msgfmt` her derlemede çeviri dosyalarını derler ve `xgettext`, çeviri şablonunu oluşturmak için `scons pot` tarafından kullanılır. Windows'ta, [gettext-iconv-windows](https://github.com/mlocati/gettext-iconv-windows/releases) adresinden modern bir sürüm yükleyin (veya `scoop install gettext` / `choco install gettext` kullanın) ve `bin` dizininin PATH'inizde diğer gettext'lerden önce geldiğinden emin olun. GnuWin32 gettext paketini kullanmayın: 0.14.4 (2005) sürümünde donmuştur ve bu derleme için çok eskidir (`scons pot`, desteklenmeyen `--package-name` seçeneği nedeniyle başarısız olur).
 
 Her şeyi yükledikten sonra, projenin kökünde scons yayınlamak, eklentiyi oluşturmalı ve dokümanlar oluşturmalıdır.
 

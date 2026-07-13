@@ -1,0 +1,75 @@
+name: Release Add-on
+
+on:
+    push:
+        tags:
+            - "**"
+    workflow_dispatch:
+
+jobs:
+    validate:
+        uses: ./.github/workflows/validate.yml
+        with:
+            upload_artifacts: false
+
+    release_addon:
+        if: startsWith(github.ref, 'refs/tags/')
+        needs: [validate]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses:
+                  actions/checkout@v4
+
+                  # The next step is used to fix a small issue here to obtain the current tag message,
+                  # which will be used as the release body. For more details:
+                  # https://github.com/actions/checkout/issues/290
+            - name: Make sure we have the correct tag information
+              run: git fetch --tags --force
+
+            - name: Obtain tag message
+              uses: ericcornelissen/git-tag-annotation-action@v2
+              id: tag-data
+
+            - name: Check differences to master branch
+              id: differences-to-master
+              run: |
+                  git fetch origin master --depth=1
+                  if git diff origin/master --exit-code; then
+                    echo "changes_exist=false" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "changes_exist=true" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Abort if tag is not applied on top of master
+              if: steps.differences-to-master.outputs.changes_exist == 'true'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      core.setFailed('Releases can be generated only from commit on head of master branch')
+
+            - name: Install system dependencies
+              run: sudo apt install gettext
+
+            - name: Install Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.13"
+
+            - name: Install Python dependencies
+              run: |
+                  pip install scons
+                  pip install markdown
+
+            - name: Generate addon
+              run: |
+                  rm -f *.nvda-addon || true
+                  scons
+
+            - name: Release
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: "*.nvda-addon"
+                  body: "${{ steps.tag-data.outputs.git-tag-annotation }}"
+                  fail_on_unmatched_files: true
+                  generate_release_notes: false
