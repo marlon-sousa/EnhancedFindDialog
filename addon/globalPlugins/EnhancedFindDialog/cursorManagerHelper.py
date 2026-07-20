@@ -52,7 +52,6 @@ SEARCH_HISTORY_LEAST_RECENT_INDEX = 19
 # searching text and no text is found.
 FIND_ERROR_DIALOG_TITLE = __("0 matches")
 
-
 def patchCursorManager():
 	#  History of search terms.
 	# Sorted in most to least recently searched order.
